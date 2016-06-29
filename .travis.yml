@@ -1,0 +1,23 @@
+sudo: false
+
+language: php
+
+cache:
+  directories:
+    - $HOME/.composer/cache
+
+php:
+    - 7
+
+before_install:
+    - composer self-update
+
+install:
+    - composer install --prefer-dist
+
+script:
+    - ./vendor/bin/phpcs -p --extensions=php --standard=ruleset.xml src
+    - ./vendor/bin/phpunit -v --coverage-clover ./build/logs/clover.xml
+
+after_script:
+    - ./vendor/bin/coveralls -v

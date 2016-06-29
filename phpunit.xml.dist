@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<phpunit
+    bootstrap="./vendor/autoload.php"
+    convertWarningsToExceptions="true"
+    convertNoticesToExceptions="true"
+    convertErrorsToExceptions="true"
+    processIsolation="false"
+    backupGlobals="false"
+    stopOnFailure="false"
+    syntaxCheck="true"
+    verbose="true"
+    colors="true"
+    columns="max"
+>
+    <testsuite name="Pipeline tests">
+        <directory>./test/PipelineTest</directory>
+    </testsuite>
+    <filter>
+        <whitelist addUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">./src</directory>
+        </whitelist>
+    </filter>
+</phpunit>
