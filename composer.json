@@ -1,5 +1,5 @@
 {
-    "name":         "streams-pipeline/streams-pipeline",
+    "name":         "pipeline/pipeline",
     "description":  "Support functional-style operations on streams of elements, such as map-reduce transformations on interators and arrays",
     "type":         "library",
     "license":      "MIT",
