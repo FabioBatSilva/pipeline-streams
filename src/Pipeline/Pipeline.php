@@ -102,7 +102,7 @@ interface Pipeline
      *
      * <code>
      * <?php
-     *     Pipelines.of("one", "two", "three", "four")
+     *     Pipelines::of("one", "two", "three", "four")
      *         ->filter(function ($e) { strlen($e) > 3})
      *         ->peek(function ($e) { echo "Filtered value: $e"})
      *         ->map('strtoupper')
@@ -143,7 +143,7 @@ interface Pipeline
      *
      * <code>
      * <?php
-     *  Pipelines.of("one", "two", "three", "four")
+     *  Pipelines::of("one", "two", "three", "four")
      *      ->forEach(function (string $e) {
      *          file_put_contents('file.log', $e, FILE_APPEND | LOCK_EX);
      *      });
@@ -167,7 +167,7 @@ interface Pipeline
      *
      * <code>
      * <?php
-     *  $sum = Pipelines.of(range(0, 100))
+     *  $sum = Pipelines::of(range(0, 100))
      *      ->reduce(function (integer $identity, integer $item) {
      *          return $identity + $item;
      *      }, 0);
