@@ -18,44 +18,41 @@
 
 declare(strict_types=1);
 
-namespace Pipeline;
+namespace Pipeline\Sink;
+
+use Pipeline\Sink;
 
 /**
- * Base Sink implementation
+ * Accept a action callback to each new element.
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-abstract class BaseSink implements Sink
+class ActionWrapper extends ChainedReference
 {
     /**
-     * {@inheritdoc}
+     * @var callable
      */
-    public function begin(int $size = null)
-    {
+    private $callable;
 
+    /**
+     * Constructor.
+     *
+     * @param \Pipeline\Sink $downstream
+     * @param callable       $callable
+     */
+    public function __construct(Sink $downstream, callable $callable)
+    {
+        $this->downstream = $downstream;
+        $this->callable   = $callable;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function end()
+    public function accept($item)
     {
+        call_user_func($this->callable, $item);
 
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getOpFlags() : int
-    {
-        return 0;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function cancellationRequested() : bool
-    {
-        return false;
+        $this->downstream->accept($item);
     }
 }

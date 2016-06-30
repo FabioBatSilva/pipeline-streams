@@ -178,7 +178,7 @@ interface Pipeline
      *
      * @return mixed
      */
-    public function reduce(callable $accumulator, $identity = null) : mixed;
+    public function reduce(callable $accumulator, $identity = null);
 
     /**
      * Performs a a operation on the elements of this stream using a Collector
@@ -195,7 +195,7 @@ interface Pipeline
      *
      * @see \Pipeline\Collectors
      */
-    public function collect(callable $collector) : mixed;
+    public function collect(callable $collector);
 
     /**
      * Returns the minimum element of this stream according to the provided callable $comparator
@@ -204,7 +204,7 @@ interface Pipeline
      *
      * @return mixed the minimum element of this stream
      */
-    public function min(callable $comparator) : mixed;
+    public function min(callable $comparator);
 
     /**
      * Returns the maximum element of this stream according to the provided callable $comparator
@@ -213,7 +213,7 @@ interface Pipeline
      *
      * @return mixed The maximum element of this stream
      */
-    public function max(callable $comparator) : mixed;
+    public function max(callable $comparator);
 
     /**
      * Returns the count of elements in this stream.
@@ -256,5 +256,5 @@ interface Pipeline
      *
      * @return boolean
      */
-    public function findFirst() : mixed;
+    public function findFirst();
 }

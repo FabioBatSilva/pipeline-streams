@@ -20,7 +20,14 @@ declare(strict_types=1);
 
 namespace Pipeline;
 
+use ArrayObject;
+
 use Pipeline\Op\ForEachOp;
+use Pipeline\Op\ReduceOp;
+
+use Pipeline\Sink\FilterWrapper;
+use Pipeline\Sink\MapperWrapper;
+use Pipeline\Sink\ActionWrapper;
 use Pipeline\Sink\ChainedReference;
 
 /**
@@ -35,37 +42,23 @@ class ReferencePipeline extends BasePipeline
      */
     public function filter(callable $predicate) : Pipeline
     {
-        return new class($this->source, $this->combinedFlags, $this, $predicate) extends ReferencePipeline
+        $source = $this->source;
+        $flags  = $this->combinedFlags;
+
+        return new class($source, $flags, $this, $predicate) extends ReferencePipeline
         {
-            private $predicate;
+            private $callable;
 
-            public function __construct($source, $flags, $previousStage, $predicate)
+            public function __construct($source, $flags, $self, $callable)
             {
-                parent::__construct($source, $flags, $previousStage);
+                parent::__construct($source, $flags, $self);
 
-                $this->predicate = $predicate;
+                $this->callable = $callable;
             }
 
             protected function opWrapSink(Sink $sink, int $flags) : Sink
             {
-                return new class ($sink, $this->predicate) extends ChainedReference
-                {
-                    private $predicate;
-
-                    public function __construct($sink, $predicate)
-                    {
-                        parent::__construct($sink);
-
-                        $this->predicate = $predicate;
-                    }
-
-                    public function accept($item)
-                    {
-                        if (call_user_func($this->predicate, $item)) {
-                            parent::accept($item);
-                        }
-                    }
-                };
+                return new FilterWrapper($sink, $this->callable);
             }
         };
     }
@@ -75,35 +68,23 @@ class ReferencePipeline extends BasePipeline
      */
     public function map(callable $mapper) : Pipeline
     {
-        return new class($this->source, $this->combinedFlags, $this, $mapper) extends ReferencePipeline
+        $source = $this->source;
+        $flags  = $this->combinedFlags;
+
+        return new class($source, $flags, $this, $mapper) extends ReferencePipeline
         {
-            private $mapper;
+            private $callable;
 
-            public function __construct($source, $flags, $previousStage, $mapper)
+            public function __construct($source, $flags, $self, $callable)
             {
-                parent::__construct($source, $flags, $previousStage);
+                parent::__construct($source, $flags, $self);
 
-                $this->mapper = $mapper;
+                $this->callable = $callable;
             }
 
             protected function opWrapSink(Sink $sink, int $flags) : Sink
             {
-                return new class ($sink, $this->mapper) extends ChainedReference
-                {
-                    private $mapper;
-
-                    public function __construct($sink, $mapper)
-                    {
-                        parent::__construct($sink);
-
-                        $this->mapper = $mapper;
-                    }
-
-                    public function accept($item)
-                    {
-                        parent::accept(call_user_func($this->mapper, $item));
-                    }
-                };
+                return new MapperWrapper($sink, $this->callable);
             }
         };
     }
@@ -153,36 +134,23 @@ class ReferencePipeline extends BasePipeline
      */
     public function peek(callable $action) : Pipeline
     {
-        return new class($this->source, $this->combinedFlags, $this, $action) extends ReferencePipeline
+        $source = $this->source;
+        $flags  = $this->combinedFlags;
+
+        return new class($source, $flags, $this, $action) extends ReferencePipeline
         {
-            private $action;
+            private $callable;
 
-            public function __construct($source, $flags, $previousStage, $action)
+            public function __construct($source, $flags, $self, $callable)
             {
-                parent::__construct($source, $flags, $previousStage);
+                parent::__construct($source, $flags, $self);
 
-                $this->action = $action;
+                $this->callable = $callable;
             }
 
             protected function opWrapSink(Sink $sink, int $flags) : Sink
             {
-                return new class ($sink, $this->action) extends ChainedReference
-                {
-                    private $action;
-
-                    public function __construct($sink, $action)
-                    {
-                        parent::__construct($sink);
-
-                        $this->action = $action;
-                    }
-
-                    public function accept($item)
-                    {
-                        call_user_func($this->action, $item);
-                        parent::accept($item);
-                    }
-                };
+                return new ActionWrapper($sink, $this->callable);
             }
         };
     }
@@ -216,13 +184,32 @@ class ReferencePipeline extends BasePipeline
      */
     public function toArray() : array
     {
+        $identity    = new ArrayObject();
+        $accumulator = function ($item, ArrayObject $state) {
 
+            $state->append($item);
+
+            return $state;
+        };
+
+        $result = $this->evaluate(new ReduceOp($accumulator, $identity));
+        $array  = $result->getArrayCopy();
+
+        return $array;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function reduce(callable $accumulator, $identity = null) : mixed
+    public function reduce(callable $accumulator, $identity = null)
+    {
+        return $this->evaluate(new ReduceOp($accumulator, $identity));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function collect(callable $collector)
     {
 
     }
@@ -230,7 +217,7 @@ class ReferencePipeline extends BasePipeline
     /**
      * {@inheritdoc}
      */
-    public function collect(callable $collector) : mixed
+    public function min(callable $comparator)
     {
 
     }
@@ -238,15 +225,7 @@ class ReferencePipeline extends BasePipeline
     /**
      * {@inheritdoc}
      */
-    public function min(callable $comparator) : mixed
-    {
-
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function max(callable $comparator) : mixed
+    public function max(callable $comparator)
     {
 
     }
@@ -286,7 +265,7 @@ class ReferencePipeline extends BasePipeline
     /**
      * {@inheritdoc}
      */
-    public function findFirst() : mixed
+    public function findFirst()
     {
 
     }

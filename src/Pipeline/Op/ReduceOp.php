@@ -18,44 +18,70 @@
 
 declare(strict_types=1);
 
-namespace Pipeline;
+namespace Pipeline\Op;
+
+use Iterator;
+
+use Pipeline\BaseSink;
+use Pipeline\TerminalOp;
+use Pipeline\TerminalSink;
+use Pipeline\BasePipeline;
+use Pipeline\PipelineOpFlag;
 
 /**
- * Base Sink implementation
+ * An operation in a stream pipeline that implement reductions.
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-abstract class BaseSink implements Sink
+class ReduceOp extends BaseSink implements TerminalOp, TerminalSink
 {
+    private $state;
+
+    private $identity;
+
+    private $accumulator;
+
+    /**
+     * Construct
+     *
+     * @param callable $accumulator
+     * @param mixed    $identity
+     */
+    public function __construct(callable $accumulator, $identity = null)
+    {
+        $this->identity    = $identity;
+        $this->accumulator = $accumulator;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function evaluate(BasePipeline $pipeline, Iterator $iterator)
+    {
+        return $pipeline->wrapAndCopyInto($this, $iterator)->get();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function get()
+    {
+        return $this->state;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function begin(int $size = null)
     {
-
+        $this->state = $this->identity;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function end()
+    public function accept($item)
     {
-
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getOpFlags() : int
-    {
-        return 0;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function cancellationRequested() : bool
-    {
-        return false;
+        $this->state = call_user_func($this->accumulator, $item, $this->state);
     }
 }
