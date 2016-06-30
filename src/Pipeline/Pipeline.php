@@ -93,7 +93,7 @@ interface Pipeline
      *
      * @return \Pipeline\Pipeline
      */
-    public function sorted(callable $comparator) : Pipeline;
+    public function sorted(callable $comparator = null) : Pipeline;
 
     /**
      * Returns a stream consisting of the elements of this stream, additionally
@@ -124,7 +124,7 @@ interface Pipeline
      *
      * @return \Pipeline\Pipeline
      */
-    public function limit(integer $maxSize) : Pipeline;
+    public function limit(int $maxSize) : Pipeline;
 
     /**
      * Returns a stream consisting of the remaining elements of this stream
@@ -136,7 +136,7 @@ interface Pipeline
      *
      * @return \Pipeline\Pipeline
      */
-    public function skip(integer $n) : Pipeline;
+    public function skip(int $n) : Pipeline;
 
     /**
      * Performs an action for each element of this stream.
@@ -168,7 +168,7 @@ interface Pipeline
      * <code>
      * <?php
      *  $sum = Pipelines::of(range(0, 100))
-     *      ->reduce(function (integer $identity, integer $item) {
+     *      ->reduce(function (int $identity, int $item) {
      *          return $identity + $item;
      *      }, 0);
      * </code>
@@ -204,7 +204,7 @@ interface Pipeline
      *
      * @return mixed the minimum element of this stream
      */
-    public function min(callable $comparator);
+    public function min(callable $comparator = null);
 
     /**
      * Returns the maximum element of this stream according to the provided callable $comparator
@@ -213,14 +213,14 @@ interface Pipeline
      *
      * @return mixed The maximum element of this stream
      */
-    public function max(callable $comparator);
+    public function max(callable $comparator = null);
 
     /**
      * Returns the count of elements in this stream.
      *
      * @return the count of elements in this stream
      */
-    public function count() : integer;
+    public function count() : int;
 
     /**
      * Returns whether any elements of this stream match the provided callable predicate.

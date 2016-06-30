@@ -25,11 +25,13 @@ use ArrayObject;
 use Pipeline\Op\ForEachOp;
 use Pipeline\Op\ReduceOp;
 
-use Pipeline\Sink\FilterWrapper;
-use Pipeline\Sink\ActionWrapper;
-use Pipeline\Sink\MapperWrapper;
+use Pipeline\Sink\SortingSink;
+use Pipeline\Sink\MappingSink;
+use Pipeline\Sink\SlicingSink;
+use Pipeline\Sink\InvokingSink;
+use Pipeline\Sink\FilteringSink;
+use Pipeline\Sink\FlatMappingSink;
 use Pipeline\Sink\ChainedReference;
-use Pipeline\Sink\FlatMapperWrapper;
 
 /**
  * Reference Pipeline
@@ -59,7 +61,7 @@ class ReferencePipeline extends BasePipeline
 
             protected function opWrapSink(Sink $sink, int $flags) : Sink
             {
-                return new FilterWrapper($sink, $this->callable);
+                return new FilteringSink($sink, $this->callable);
             }
         };
     }
@@ -85,7 +87,7 @@ class ReferencePipeline extends BasePipeline
 
             protected function opWrapSink(Sink $sink, int $flags) : Sink
             {
-                return new MapperWrapper($sink, $this->callable);
+                return new MappingSink($sink, $this->callable);
             }
         };
     }
@@ -119,7 +121,7 @@ class ReferencePipeline extends BasePipeline
 
             protected function opWrapSink(Sink $sink, int $flags) : Sink
             {
-                return new FlatMapperWrapper($sink, $this->callable);
+                return new FlatMappingSink($sink, $this->callable);
             }
         };
     }
@@ -143,9 +145,27 @@ class ReferencePipeline extends BasePipeline
     /**
      * {@inheritdoc}
      */
-    public function sorted(callable $comparator) : Pipeline
+    public function sorted(callable $comparator = null) : Pipeline
     {
+        $source = $this->source;
+        $flags  = $this->combinedFlags;
 
+        return new class($source, $flags, $this, $comparator) extends ReferencePipeline
+        {
+            private $callable;
+
+            public function __construct($source, $flags, $self, $callable)
+            {
+                parent::__construct($source, $flags, $self);
+
+                $this->callable = $callable;
+            }
+
+            protected function opWrapSink(Sink $sink, int $flags) : Sink
+            {
+                return new SortingSink($sink, $this->callable);
+            }
+        };
     }
 
     /**
@@ -169,7 +189,7 @@ class ReferencePipeline extends BasePipeline
 
             protected function opWrapSink(Sink $sink, int $flags) : Sink
             {
-                return new ActionWrapper($sink, $this->callable);
+                return new InvokingSink($sink, $this->callable);
             }
         };
     }
@@ -177,17 +197,53 @@ class ReferencePipeline extends BasePipeline
     /**
      * {@inheritdoc}
      */
-    public function limit(integer $maxSize) : Pipeline
+    public function limit(int $maxSize) : Pipeline
     {
+        $source = $this->source;
+        $flags  = $this->combinedFlags;
 
+        return new class($source, $flags, $this, $maxSize) extends ReferencePipeline
+        {
+            private $maxSize;
+
+            public function __construct($source, $flags, $self, $maxSize)
+            {
+                parent::__construct($source, $flags, $self);
+
+                $this->maxSize = $maxSize;
+            }
+
+            protected function opWrapSink(Sink $sink, int $flags) : Sink
+            {
+                return new SlicingSink($sink, null, $this->maxSize);
+            }
+        };
     }
 
     /**
      * {@inheritdoc}
      */
-    public function skip(integer $n) : Pipeline
+    public function skip(int $skip) : Pipeline
     {
+        $source = $this->source;
+        $flags  = $this->combinedFlags;
 
+        return new class($source, $flags, $this, $skip) extends ReferencePipeline
+        {
+            private $skip;
+
+            public function __construct($source, $flags, $self, $skip)
+            {
+                parent::__construct($source, $flags, $self);
+
+                $this->skip = $skip;
+            }
+
+            protected function opWrapSink(Sink $sink, int $flags) : Sink
+            {
+                return new SlicingSink($sink, $this->skip, null);
+            }
+        };
     }
 
     /**
@@ -236,25 +292,60 @@ class ReferencePipeline extends BasePipeline
     /**
      * {@inheritdoc}
      */
-    public function min(callable $comparator)
+    public function min(callable $comparator = null)
     {
+        if ($comparator === null) {
+            $comparator = function ($item, $current) {
 
+                if ($current === null){
+                    return $item;
+                }
+
+                if ($item < $current){
+                    return $item;
+                }
+
+                return $current;
+            };
+        }
+
+        return $this->evaluate(new ReduceOp($comparator));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function max(callable $comparator)
+    public function max(callable $comparator = null)
     {
+        if ($comparator === null) {
+            $comparator = function ($item, $current) {
 
+                if ($current === null){
+                    return $item;
+                }
+
+                if ($item > $current){
+                    return $item;
+                }
+
+                return $current;
+            };
+        }
+
+        return $this->evaluate(new ReduceOp($comparator));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function count() : integer
+    public function count() : int
     {
+        $count    = 0;
+        $callable = function ($_, int $state) {
+            return ++ $state;
+        };
 
+        return $this->evaluate(new ReduceOp($callable, $count));
     }
 
     /**

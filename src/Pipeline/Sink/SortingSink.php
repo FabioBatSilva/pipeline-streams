@@ -23,11 +23,11 @@ namespace Pipeline\Sink;
 use Pipeline\Sink;
 
 /**
- * Accept a action callback to each new element.
+ * A Sink for implementing sort on streams.
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-class ActionWrapper extends ChainedReference
+class SortingSink extends ChainedReference
 {
     /**
      * @var callable
@@ -35,12 +35,22 @@ class ActionWrapper extends ChainedReference
     private $callable;
 
     /**
+     * @var array
+     */
+    private $values;
+
+    /**
+     * @var integer
+     */
+    private $offset = 0;
+
+    /**
      * Constructor.
      *
      * @param \Pipeline\Sink $downstream
      * @param callable       $callable
      */
-    public function __construct(Sink $downstream, callable $callable)
+    public function __construct(Sink $downstream, callable $callable = null)
     {
         $this->downstream = $downstream;
         $this->callable   = $callable;
@@ -49,12 +59,54 @@ class ActionWrapper extends ChainedReference
     /**
      * {@inheritdoc}
      */
+    public function begin(int $size = null)
+    {
+        $this->offset = 0;
+        $this->values = [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function accept($item)
     {
-        $callable = $this->callable;
+        $this->values[$this->offset ++] = $item;
+    }
 
-        $callable($item);
+    /**
+     * {@inheritdoc}
+     */
+    public function end()
+    {
+        $this->sort();
 
-        $this->downstream->accept($item);
+        $this->downstream->begin($this->offset);
+
+        foreach ($this->values as $value) {
+            $this->downstream->accept($value);
+
+            if ($this->downstream->cancellationRequested()) {
+                break;
+            }
+        }
+
+        $this->offset = 0;
+        $this->values = [];
+
+        $this->downstream->end();
+    }
+
+    /**
+     * Sort the values array
+     */
+    private function sort()
+    {
+        if ($this->callable === null) {
+            sort($this->values);
+
+            return;
+        }
+
+        usort($this->values, $this->callable);
     }
 }

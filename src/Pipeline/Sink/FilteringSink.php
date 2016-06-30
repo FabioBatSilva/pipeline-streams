@@ -23,11 +23,11 @@ namespace Pipeline\Sink;
 use Pipeline\Sink;
 
 /**
- * Accept a filter callback to each new element.
+ * A Sink for filtering values in a stream.
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-class FilterWrapper extends ChainedReference
+class FilteringSink extends ChainedReference
 {
     /**
      * @var callable

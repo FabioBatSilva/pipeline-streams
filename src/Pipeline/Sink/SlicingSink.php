@@ -23,27 +23,49 @@ namespace Pipeline\Sink;
 use Pipeline\Sink;
 
 /**
- * Accept a mapper callback to each new element.
+ * A Sink for slicing a stream.
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-class MapperWrapper extends ChainedReference
+class SlicingSink extends ChainedReference
 {
     /**
      * @var callable
      */
-    private $callable;
+    private $skip;
+
+    /**
+     * @var callable
+     */
+    private $limit;
+
+    /**
+     * @var integer
+     */
+    private $offset = 0;
 
     /**
      * Constructor.
      *
      * @param \Pipeline\Sink $downstream
-     * @param callable       $action
+     * @param int            $skip
+     * @param int            $limit
      */
-    public function __construct(Sink $downstream, callable $callable)
+    public function __construct(Sink $downstream, int $skip = null, int $limit = null)
     {
         $this->downstream = $downstream;
-        $this->callable   = $callable;
+        $this->limit      = $limit;
+        $this->skip       = $skip;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function begin(int $size = null)
+    {
+        $this->offset = 0;
+
+        $this->downstream->begin($size);
     }
 
     /**
@@ -51,9 +73,24 @@ class MapperWrapper extends ChainedReference
      */
     public function accept($item)
     {
-        $callable = $this->callable;
-        $result   = $callable($item);
+        $this->offset ++;
 
-        $this->downstream->accept($result);
+        if ($this->skip !== null && $this->offset <= $this->skip) {
+            return;
+        }
+
+        if ($this->limit !== null && $this->offset > $this->limit) {
+            return;
+        }
+
+        $this->downstream->accept($item);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function cancellationRequested() : bool
+    {
+        return ($this->limit !== null && $this->offset > $this->limit);
     }
 }

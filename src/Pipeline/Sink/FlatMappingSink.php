@@ -23,11 +23,11 @@ namespace Pipeline\Sink;
 use Pipeline\Sink;
 
 /**
- * Accept a mapper callback to each new element and flattens the result.
+ * A Sink for flattening values in a stream.
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-class FlatMapperWrapper extends ChainedReference
+class FlatMappingSink extends ChainedReference
 {
     /**
      * @var callable
