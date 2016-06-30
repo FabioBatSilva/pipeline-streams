@@ -51,6 +51,9 @@ class MapperWrapper extends ChainedReference
      */
     public function accept($item)
     {
-        $this->downstream->accept(call_user_func($this->callable, $item));
+        $callable = $this->callable;
+        $result   = $callable($item);
+
+        $this->downstream->accept($result);
     }
 }

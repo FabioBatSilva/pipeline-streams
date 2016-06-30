@@ -51,10 +51,11 @@ class FilterWrapper extends ChainedReference
      */
     public function accept($item)
     {
-        if ( ! call_user_func($this->callable, $item)) {
-            return;
-        }
+        $callable = $this->callable;
+        $result   = $callable($item);
 
-        $this->downstream->accept($item);
+        if ($result === true) {
+            $this->downstream->accept($item);;
+        }
     }
 }

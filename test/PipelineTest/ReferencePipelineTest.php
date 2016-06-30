@@ -33,6 +33,19 @@ class ReferencePipelineTest extends TestCase
         $this->assertEquals([2, 4, 6, 8, 10], $result);
     }
 
+    public function testFlatMap()
+    {
+        $iterator = new ArrayIterator([[1,2,3], [4,5,6], [7,8,9]]);
+        $pipeline = new ReferencePipeline($iterator);
+        $result   = $pipeline
+            ->flatMap(function(array $e) {
+                return $e;
+            })
+            ->toArray();
+
+        $this->assertEquals([1,2,3,4,5,6,7,8,9], $result);
+    }
+
     public function testForEach()
     {
         $iterator = new ArrayIterator(range(0, 10));

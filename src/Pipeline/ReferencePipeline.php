@@ -26,9 +26,10 @@ use Pipeline\Op\ForEachOp;
 use Pipeline\Op\ReduceOp;
 
 use Pipeline\Sink\FilterWrapper;
-use Pipeline\Sink\MapperWrapper;
 use Pipeline\Sink\ActionWrapper;
+use Pipeline\Sink\MapperWrapper;
 use Pipeline\Sink\ChainedReference;
+use Pipeline\Sink\FlatMapperWrapper;
 
 /**
  * Reference Pipeline
@@ -102,7 +103,25 @@ class ReferencePipeline extends BasePipeline
      */
     public function flatMap(callable $mapper) : Pipeline
     {
+        $source = $this->source;
+        $flags  = $this->combinedFlags;
 
+        return new class($source, $flags, $this, $mapper) extends ReferencePipeline
+        {
+            private $callable;
+
+            public function __construct($source, $flags, $self, $callable)
+            {
+                parent::__construct($source, $flags, $self);
+
+                $this->callable = $callable;
+            }
+
+            protected function opWrapSink(Sink $sink, int $flags) : Sink
+            {
+                return new FlatMapperWrapper($sink, $this->callable);
+            }
+        };
     }
 
     /**

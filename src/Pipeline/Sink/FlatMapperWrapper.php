@@ -23,11 +23,11 @@ namespace Pipeline\Sink;
 use Pipeline\Sink;
 
 /**
- * Accept a action callback to each new element.
+ * Accept a mapper callback to each new element and flattens the result.
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-class ActionWrapper extends ChainedReference
+class FlatMapperWrapper extends ChainedReference
 {
     /**
      * @var callable
@@ -38,7 +38,7 @@ class ActionWrapper extends ChainedReference
      * Constructor.
      *
      * @param \Pipeline\Sink $downstream
-     * @param callable       $callable
+     * @param callable       $action
      */
     public function __construct(Sink $downstream, callable $callable)
     {
@@ -52,9 +52,14 @@ class ActionWrapper extends ChainedReference
     public function accept($item)
     {
         $callable = $this->callable;
+        $result   = $callable($item);
 
-        $callable($item);
+        if ($result === null) {
+            return;
+        }
 
-        $this->downstream->accept($item);
+        foreach ($result as $value) {
+            $this->downstream->accept($value);
+        }
     }
 }
