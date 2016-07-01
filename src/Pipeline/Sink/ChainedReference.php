@@ -48,9 +48,9 @@ class ChainedReference implements Sink
     /**
      * {@inheritdoc}
      */
-    public function begin(int $size = null)
+    public function begin()
     {
-        $this->downstream->begin($size);
+        $this->downstream->begin();
     }
 
     /**

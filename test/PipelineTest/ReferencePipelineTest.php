@@ -246,4 +246,22 @@ class ReferencePipelineTest extends TestCase
         $this->assertEquals(4, $result[0]);
         $this->assertEquals(8, $result[1]);
     }
+
+    /**
+     * @expectedException        \InvalidArgumentException
+     * @expectedExceptionMessage Argument 1 passed to Pipeline\BasePipeline::__construct() must be an instance of "Iterator" or "Pipeline\BasePipeline", "array" given.
+     */
+    public function testConstructArrayException()
+    {
+        new ReferencePipeline([]);
+    }
+
+    /**
+     * @expectedException        \InvalidArgumentException
+     * @expectedExceptionMessage Argument 1 passed to Pipeline\BasePipeline::__construct() must be an instance of "Iterator" or "Pipeline\BasePipeline", "stdClass" given.
+     */
+    public function testConstructStdClassException()
+    {
+        new ReferencePipeline(new \stdClass);
+    }
 }

@@ -59,7 +59,7 @@ class SortingSink extends ChainedReference
     /**
      * {@inheritdoc}
      */
-    public function begin(int $size = null)
+    public function begin()
     {
         $this->offset = 0;
         $this->values = [];

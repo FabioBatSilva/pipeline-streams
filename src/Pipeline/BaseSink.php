@@ -30,7 +30,7 @@ abstract class BaseSink implements Sink
     /**
      * {@inheritdoc}
      */
-    public function begin(int $size = null)
+    public function begin()
     {
 
     }

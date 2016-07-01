@@ -48,21 +48,18 @@ class ReferencePipeline extends BasePipeline
      */
     public function filter(callable $predicate) : Pipeline
     {
-        $source = $this->source;
-        $flags  = $this->combinedFlags;
-
-        return new class($source, $flags, $this, $predicate) extends ReferencePipeline
+        return new class($this, $predicate) extends ReferencePipeline
         {
             private $callable;
 
-            public function __construct($source, $flags, $self, $callable)
+            public function __construct($source, $callable)
             {
-                parent::__construct($source, $flags, $self);
+                parent::__construct($source);
 
                 $this->callable = $callable;
             }
 
-            protected function opWrapSink(Sink $sink, int $flags) : Sink
+            protected function opWrapSink(Sink $sink) : Sink
             {
                 return new FilteringSink($sink, $this->callable);
             }
@@ -74,21 +71,18 @@ class ReferencePipeline extends BasePipeline
      */
     public function map(callable $mapper) : Pipeline
     {
-        $source = $this->source;
-        $flags  = $this->combinedFlags;
-
-        return new class($source, $flags, $this, $mapper) extends ReferencePipeline
+        return new class($this, $mapper) extends ReferencePipeline
         {
             private $callable;
 
-            public function __construct($source, $flags, $self, $callable)
+            public function __construct($source, $callable)
             {
-                parent::__construct($source, $flags, $self);
+                parent::__construct($source);
 
                 $this->callable = $callable;
             }
 
-            protected function opWrapSink(Sink $sink, int $flags) : Sink
+            protected function opWrapSink(Sink $sink) : Sink
             {
                 return new MappingSink($sink, $this->callable);
             }
@@ -108,21 +102,18 @@ class ReferencePipeline extends BasePipeline
      */
     public function flatMap(callable $mapper) : Pipeline
     {
-        $source = $this->source;
-        $flags  = $this->combinedFlags;
-
-        return new class($source, $flags, $this, $mapper) extends ReferencePipeline
+        return new class($this, $mapper) extends ReferencePipeline
         {
             private $callable;
 
-            public function __construct($source, $flags, $self, $callable)
+            public function __construct($source, $callable)
             {
-                parent::__construct($source, $flags, $self);
+                parent::__construct($source);
 
                 $this->callable = $callable;
             }
 
-            protected function opWrapSink(Sink $sink, int $flags) : Sink
+            protected function opWrapSink(Sink $sink) : Sink
             {
                 return new FlatMappingSink($sink, $this->callable);
             }
@@ -150,21 +141,18 @@ class ReferencePipeline extends BasePipeline
      */
     public function sorted(callable $comparator = null) : Pipeline
     {
-        $source = $this->source;
-        $flags  = $this->combinedFlags;
-
-        return new class($source, $flags, $this, $comparator) extends ReferencePipeline
+        return new class($this, $comparator) extends ReferencePipeline
         {
             private $callable;
 
-            public function __construct($source, $flags, $self, $callable)
+            public function __construct($source, $callable)
             {
-                parent::__construct($source, $flags, $self);
+                parent::__construct($source);
 
                 $this->callable = $callable;
             }
 
-            protected function opWrapSink(Sink $sink, int $flags) : Sink
+            protected function opWrapSink(Sink $sink) : Sink
             {
                 return new SortingSink($sink, $this->callable);
             }
@@ -176,21 +164,18 @@ class ReferencePipeline extends BasePipeline
      */
     public function peek(callable $action) : Pipeline
     {
-        $source = $this->source;
-        $flags  = $this->combinedFlags;
-
-        return new class($source, $flags, $this, $action) extends ReferencePipeline
+        return new class($this, $action) extends ReferencePipeline
         {
             private $callable;
 
-            public function __construct($source, $flags, $self, $callable)
+            public function __construct($source, $callable)
             {
-                parent::__construct($source, $flags, $self);
+                parent::__construct($source);
 
                 $this->callable = $callable;
             }
 
-            protected function opWrapSink(Sink $sink, int $flags) : Sink
+            protected function opWrapSink(Sink $sink) : Sink
             {
                 return new InvokingSink($sink, $this->callable);
             }
@@ -202,21 +187,18 @@ class ReferencePipeline extends BasePipeline
      */
     public function limit(int $maxSize) : Pipeline
     {
-        $source = $this->source;
-        $flags  = $this->combinedFlags;
-
-        return new class($source, $flags, $this, $maxSize) extends ReferencePipeline
+        return new class($this, $maxSize) extends ReferencePipeline
         {
             private $maxSize;
 
-            public function __construct($source, $flags, $self, $maxSize)
+            public function __construct($source, $maxSize)
             {
-                parent::__construct($source, $flags, $self);
+                parent::__construct($source);
 
                 $this->maxSize = $maxSize;
             }
 
-            protected function opWrapSink(Sink $sink, int $flags) : Sink
+            protected function opWrapSink(Sink $sink) : Sink
             {
                 return new SlicingSink($sink, null, $this->maxSize);
             }
@@ -228,21 +210,18 @@ class ReferencePipeline extends BasePipeline
      */
     public function skip(int $skip) : Pipeline
     {
-        $source = $this->source;
-        $flags  = $this->combinedFlags;
-
-        return new class($source, $flags, $this, $skip) extends ReferencePipeline
+        return new class($this, $skip) extends ReferencePipeline
         {
             private $skip;
 
-            public function __construct($source, $flags, $self, $skip)
+            public function __construct($source, $skip)
             {
-                parent::__construct($source, $flags, $self);
+                parent::__construct($source);
 
                 $this->skip = $skip;
             }
 
-            protected function opWrapSink(Sink $sink, int $flags) : Sink
+            protected function opWrapSink(Sink $sink) : Sink
             {
                 return new SlicingSink($sink, $this->skip, null);
             }

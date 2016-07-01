@@ -48,14 +48,6 @@ abstract class BasePipeline implements Pipeline
     protected $previousStage;
 
     /**
-     * The next stage in the pipeline, or null if this is the last stage.
-     * Effectively final at the point of linking to the next pipeline.
-     *
-     * @var AbstractPipeline
-     */
-    protected $nextStage;
-
-    /**
      * True if this pipeline has been linked or consumed
      *
      * @var boolean
@@ -70,50 +62,31 @@ abstract class BasePipeline implements Pipeline
     protected $source;
 
     /**
-     * The combined source and operation flags for the source and all operations
-     * up to and including the operation represented by this pipeline object.
-     * Valid at the point of pipeline preparation for evaluation.
-     *
-     * @var int
-     */
-    protected $combinedFlags = 0;
-
-    /**
      * Construct
      *
-     * @param callable $consumer
-     * @param boolean  $ordered
+     * @param Iterator|BasePipeline $consumer
      */
-    public function __construct(Iterator $source, int $flags = 0, Pipeline $previousStage = null)
+    public function __construct($source)
     {
-        $this->source        = $source;
-        $this->combinedFlags = $flags;
-        $this->sourceStage   = $this;
-
-        if ($previousStage !== null) {
-            $this->combinedFlags += $previousStage->combinedFlags;
-
-            $this->sourceStage   = $previousStage->sourceStage;
-            $this->previousStage = $previousStage;
-
-            $previousStage->nextStage = $this;
-        }
-    }
-
-    /**
-     * Returns the exact output size of Iterator
-     *
-     * @param \Iterator $iterator
-     *
-     * @return integer the exact size if known, or NULL if infinite or unknown
-     */
-    public function exactOutputSizeIfKnown(Iterator $iterator)
-    {
-        if ($iterator instanceof Countable) {
-            return $iterator->count();
+        if ( ! $source instanceof BasePipeline && ! $source instanceof Iterator) {
+            throw new \InvalidArgumentException(sprintf(
+                'Argument 1 passed to %s() must be an instance of "%s" or "%s", "%s" given.',
+                __METHOD__,
+                Iterator::CLASS,
+                BasePipeline::CLASS,
+                is_object($source) ? get_class($source) : gettype($source)
+            ));
         }
 
-        return null;
+        if ($source instanceof BasePipeline) {
+            $this->sourceStage   = $source->sourceStage;
+            $this->previousStage = $source;
+        }
+
+        if ($source instanceof Iterator) {
+            $this->source      = $source;
+            $this->sourceStage = $this;
+        }
     }
 
     /**
@@ -138,7 +111,7 @@ abstract class BasePipeline implements Pipeline
      */
     public function copyInto(Sink $sink, Iterator $iterator)
     {
-        $sink->begin($this->exactOutputSizeIfKnown($iterator));
+        $sink->begin();
 
         foreach ($iterator as $value) {
             $sink->accept($value);
@@ -166,7 +139,7 @@ abstract class BasePipeline implements Pipeline
         $pipeline = $this;
 
         while ($pipeline !== null) {
-            $sink     = $pipeline->opWrapSink($sink, $pipeline->combinedFlags);
+            $sink     = $pipeline->opWrapSink($sink);
             $pipeline = $pipeline->previousStage;
         }
 
@@ -176,16 +149,16 @@ abstract class BasePipeline implements Pipeline
     /**
      * Evaluate the pipeline with a terminal operation to produce a result.
      *
-     * @param <R> the type of result
-     * @param terminalOp the terminal operation to be applied to the pipeline.
-     * @return the result
+     * @param TerminalOp $terminalOp the terminal operation to be applied to the pipeline.
+     *
+     * @return mixed
      */
     public function evaluate(TerminalOp $terminalOp)
     {
-        $flags    = $terminalOp->getOpFlags();
         $iterator = $this->sourceIterator();
+        $result   = $terminalOp->evaluate($this, $iterator);
 
-        return $terminalOp->evaluate($this, $iterator);
+        return $result;
     }
 
     /**
@@ -215,7 +188,7 @@ abstract class BasePipeline implements Pipeline
      *
      * @return \Pipeline\Sink
      */
-    protected function opWrapSink(Sink $sink, int $flags) : Sink
+    protected function opWrapSink(Sink $sink) : Sink
     {
         return $sink;
     }

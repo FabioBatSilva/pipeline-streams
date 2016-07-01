@@ -20,8 +20,7 @@ class ChainedReferenceTest extends TestCase
 
         $sink
             ->expects($this->once())
-            ->method('begin')
-            ->with($this->equalTo(3));
+            ->method('begin');
 
         $sink
             ->expects($this->exactly(3))
@@ -36,7 +35,7 @@ class ChainedReferenceTest extends TestCase
             ->expects($this->once())
             ->method('end');
 
-        $chain->begin(3);
+        $chain->begin();
 
         $chain->accept('one');
         $chain->accept('two');

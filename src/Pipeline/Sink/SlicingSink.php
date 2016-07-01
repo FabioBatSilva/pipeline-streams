@@ -61,11 +61,11 @@ class SlicingSink extends ChainedReference
     /**
      * {@inheritdoc}
      */
-    public function begin(int $size = null)
+    public function begin()
     {
         $this->offset = 0;
 
-        $this->downstream->begin($size);
+        $this->downstream->begin();
     }
 
     /**

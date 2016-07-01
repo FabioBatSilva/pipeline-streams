@@ -38,28 +38,14 @@ class ForEachOp extends BaseTerminalSink
     private $consumer;
 
     /**
-     * @var boolean
-     */
-    private $ordered;
-
-    /**
      * Construct
      *
      * @param callable $consumer
      * @param boolean  $ordered
      */
-    public function __construct(callable $consumer, bool $ordered)
+    public function __construct(callable $consumer)
     {
-        $this->ordered  = $ordered;
         $this->consumer = $consumer;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getOpFlags() : int
-    {
-        return $this->ordered ? 0 : PipelineOpFlag::NOT_ORDERED;
     }
 
     /**

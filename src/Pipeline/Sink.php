@@ -32,10 +32,8 @@ interface Sink
      * Resets the sink state to receive a fresh data set.
      * This must be called before sending any data to the sink.
      * After calling end, you may call this method to reset the sink for another calculation.
-     *
-     * @param int $size The exact size of the data to be pushed downstream
      */
-    public function begin(int $size = null);
+    public function begin();
 
     /**
      * Performs this operation on the given argument.

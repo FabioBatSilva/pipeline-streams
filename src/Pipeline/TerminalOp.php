@@ -30,13 +30,6 @@ use \Iterator;
 interface TerminalOp
 {
     /**
-     * Gets the stream flags of the operation.
-     *
-     * @return integer
-     */
-    public function getOpFlags() : int;
-
-    /**
      * Performs a sequential evaluation of the operation using the specified
      * Pipeline, which describes the upstream intermediate operations.
      *
