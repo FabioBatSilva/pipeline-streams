@@ -37,18 +37,18 @@ use Pipeline\Sink\FlatMappingSink;
 use Pipeline\Sink\ChainedReference;
 
 /**
- * Reference Pipeline
+ * Default Pipeline
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-class ReferencePipeline extends BasePipeline
+class DefaultPipeline extends BasePipeline
 {
     /**
      * {@inheritdoc}
      */
     public function filter(callable $predicate) : Pipeline
     {
-        return new class($this, $predicate) extends ReferencePipeline
+        return new class($this, $predicate) extends DefaultPipeline
         {
             private $callable;
 
@@ -71,7 +71,7 @@ class ReferencePipeline extends BasePipeline
      */
     public function map(callable $mapper) : Pipeline
     {
-        return new class($this, $mapper) extends ReferencePipeline
+        return new class($this, $mapper) extends DefaultPipeline
         {
             private $callable;
 
@@ -92,9 +92,24 @@ class ReferencePipeline extends BasePipeline
     /**
      * {@inheritdoc}
      */
-    public function mapToInt(callable $mapper) : IntPipeline
+    public function mapToNumeric(callable $mapper) : NumericPipeline
     {
+        return new class($this, $mapper) extends DefaultNumericPipeline
+        {
+            private $callable;
 
+            public function __construct($source, $callable)
+            {
+                parent::__construct($source);
+
+                $this->callable = $callable;
+            }
+
+            protected function opWrapSink(Sink $sink) : Sink
+            {
+                return new MappingSink($sink, $this->callable);
+            }
+        };
     }
 
     /**
@@ -102,7 +117,7 @@ class ReferencePipeline extends BasePipeline
      */
     public function flatMap(callable $mapper) : Pipeline
     {
-        return new class($this, $mapper) extends ReferencePipeline
+        return new class($this, $mapper) extends DefaultPipeline
         {
             private $callable;
 
@@ -123,9 +138,24 @@ class ReferencePipeline extends BasePipeline
     /**
      * {@inheritdoc}
      */
-    public function flatMapToInt(callable $mapper) : IntPipeline
+    public function flatMapToNumeric(callable $mapper) : NumericPipeline
     {
+        return new class($this, $mapper) extends DefaultNumericPipeline
+        {
+            private $callable;
 
+            public function __construct($source, $callable)
+            {
+                parent::__construct($source);
+
+                $this->callable = $callable;
+            }
+
+            protected function opWrapSink(Sink $sink) : Sink
+            {
+                return new FlatMappingSink($sink, $this->callable);
+            }
+        };
     }
 
     /**
@@ -141,7 +171,7 @@ class ReferencePipeline extends BasePipeline
      */
     public function sorted(callable $comparator = null) : Pipeline
     {
-        return new class($this, $comparator) extends ReferencePipeline
+        return new class($this, $comparator) extends DefaultPipeline
         {
             private $callable;
 
@@ -164,7 +194,7 @@ class ReferencePipeline extends BasePipeline
      */
     public function peek(callable $action) : Pipeline
     {
-        return new class($this, $action) extends ReferencePipeline
+        return new class($this, $action) extends DefaultPipeline
         {
             private $callable;
 
@@ -187,7 +217,7 @@ class ReferencePipeline extends BasePipeline
      */
     public function limit(int $maxSize) : Pipeline
     {
-        return new class($this, $maxSize) extends ReferencePipeline
+        return new class($this, $maxSize) extends DefaultPipeline
         {
             private $maxSize;
 
@@ -210,7 +240,7 @@ class ReferencePipeline extends BasePipeline
      */
     public function skip(int $skip) : Pipeline
     {
-        return new class($this, $skip) extends ReferencePipeline
+        return new class($this, $skip) extends DefaultPipeline
         {
             private $skip;
 

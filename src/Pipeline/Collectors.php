@@ -57,4 +57,57 @@ final class Collectors
             }
         };
     }
+
+    /**
+     * Returns a Collector that produces the sum of a numbers
+     * function applied to the input elements. If no elements are present, the result is 0.
+     *
+     * @return \Pipeline\Collector
+     */
+    public static function summingNumbers()
+    {
+        return new class() implements Collector
+        {
+            private $sum = 0;
+
+            public function accept($item)
+            {
+                $this->sum += $item;
+            }
+
+            public function get()
+            {
+                return $this->sum;
+            }
+        };
+    }
+
+    /**
+     * Returns a Collector that produces the arithmetic mean.
+     * If no elements are present, the result is 0.
+     *
+     * @return \Pipeline\Collector
+     */
+    public static function averagingNumbers()
+    {
+        return new class() implements Collector
+        {
+            private $sum   = 0;
+            private $count = 0;
+
+            public function accept($item)
+            {
+                $this->sum += $item;
+
+                $this->count++;
+            }
+
+            public function get()
+            {
+                return $this->count > 0
+                    ? $this->sum / $this->count
+                    : 0;
+            }
+        };
+    }
 }

@@ -52,9 +52,9 @@ interface Pipeline
      *
      * @param callable $mapper callable to apply to each element
      *
-     * @return \Pipeline\Pipeline
+     * @return \Pipeline\NumericPipeline
      */
-    public function mapToInt(callable $mapper) : IntPipeline;
+    public function mapToNumeric(callable $mapper) : NumericPipeline;
 
     /**
      * Returns a stream consisting of the results of replacing each element of
@@ -74,9 +74,9 @@ interface Pipeline
      *
      * @param callable $mapper A function to apply to each element which produces a stream of new values
      *
-     * @return \Pipeline\IntPipeline
+     * @return \Pipeline\NumericPipeline
      */
-    public function flatMapToInt(callable $mapper) : IntPipeline;
+    public function flatMapToNumeric(callable $mapper) : NumericPipeline;
 
     /**
      * Returns a stream consisting of the distinct elements.

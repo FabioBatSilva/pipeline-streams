@@ -70,8 +70,8 @@ abstract class BasePipeline implements Pipeline
     {
         if ( ! $source instanceof BasePipeline && ! $source instanceof Iterator) {
             throw new \InvalidArgumentException(sprintf(
-                'Argument 1 passed to %s() must be an instance of "%s" or "%s", "%s" given.',
-                __METHOD__,
+                'Argument 1 passed to %s construct must be an instance of "%s" or "%s", "%s" given.',
+                get_class(),
                 Iterator::CLASS,
                 BasePipeline::CLASS,
                 is_object($source) ? get_class($source) : gettype($source)
