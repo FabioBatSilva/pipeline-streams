@@ -34,7 +34,7 @@ use Pipeline\Sink\SlicingSink;
 use Pipeline\Sink\InvokingSink;
 use Pipeline\Sink\FilteringSink;
 use Pipeline\Sink\FlatMappingSink;
-use Pipeline\Sink\ChainedReference;
+use Pipeline\Sink\DistinguishSink;
 
 /**
  * Default Pipeline
@@ -163,7 +163,13 @@ class DefaultPipeline extends BasePipeline
      */
     public function distinct() : Pipeline
     {
-
+        return new class($this) extends DefaultPipeline
+        {
+            protected function opWrapSink(Sink $sink) : Sink
+            {
+                return new DistinguishSink($sink);
+            }
+        };
     }
 
     /**

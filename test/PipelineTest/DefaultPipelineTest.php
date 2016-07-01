@@ -243,6 +243,16 @@ class DefaultPipelineTest extends TestCase
         $this->assertEquals(2.5, $result);
     }
 
+    public function testDistinct()
+    {
+        $values   = [1, 2, 2, 3, 4, 5, 5, 1];
+        $iterator = new ArrayIterator($values);
+        $pipeline = new DefaultPipeline($iterator);
+        $result   = $pipeline->distinct()->toArray();
+
+        $this->assertEquals([1, 2, 3, 4, 5], $result);
+    }
+
     public function testForEach()
     {
         $iterator = new ArrayIterator(array_reverse(range(0, 10)));
