@@ -4,6 +4,7 @@ namespace PipelineTest;
 
 use ArrayObject;
 use ArrayIterator;
+use Pipeline\Collector;
 use Pipeline\ReferencePipeline;
 
 class ReferencePipelineTest extends TestCase
@@ -194,6 +195,30 @@ class ReferencePipelineTest extends TestCase
         $this->assertFalse($pipeline2->noneMatch(function(int $e) {
             return $e < 5;
         }));
+    }
+
+    public function testCollect()
+    {
+        $values    = ['one', 'two', 'three'];
+        $iterator  = new ArrayIterator($values);
+        $pipeline  = new ReferencePipeline($iterator);
+        $collector = $this->createMock(Collector::CLASS);
+
+        $collector
+            ->expects($this->once())
+            ->method('get')
+            ->willReturn('foo-bar');
+
+        $collector
+            ->expects($this->exactly(3))
+            ->method('accept')
+            ->withConsecutive(
+                $this->equalTo('one'),
+                $this->equalTo('two'),
+                $this->equalTo('three')
+            );
+
+        $this->assertEquals('foo-bar', $pipeline->collect($collector));
     }
 
     public function testForEach()

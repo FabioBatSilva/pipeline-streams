@@ -23,6 +23,7 @@ namespace Pipeline;
 use ArrayObject;
 
 use Pipeline\Op\ForEachOp;
+use Pipeline\Op\CollectOp;
 use Pipeline\Op\ReduceOp;
 use Pipeline\Op\MatchOp;
 use Pipeline\Op\FindOp;
@@ -261,18 +262,7 @@ class ReferencePipeline extends BasePipeline
      */
     public function toArray() : array
     {
-        $identity    = new ArrayObject();
-        $accumulator = function ($item, ArrayObject $state) {
-
-            $state->append($item);
-
-            return $state;
-        };
-
-        $result = $this->evaluate(new ReduceOp($accumulator, $identity));
-        $array  = $result->getArrayCopy();
-
-        return $array;
+        return $this->collect(Collectors::asArray());
     }
 
     /**
@@ -286,9 +276,9 @@ class ReferencePipeline extends BasePipeline
     /**
      * {@inheritdoc}
      */
-    public function collect(callable $collector)
+    public function collect(Collector $collector)
     {
-
+        return $this->evaluate(new CollectOp($collector));
     }
 
     /**

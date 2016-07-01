@@ -195,7 +195,7 @@ interface Pipeline
      *
      * @see \Pipeline\Collectors
      */
-    public function collect(callable $collector);
+    public function collect(Collector $collector);
 
     /**
      * Returns the minimum element of this stream according to the provided callable $comparator
