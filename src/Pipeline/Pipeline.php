@@ -229,7 +229,7 @@ interface Pipeline
      *
      * @return boolean
      */
-    public function anyMatch(callable $predicate) : boolean;
+    public function anyMatch(callable $predicate) : bool;
 
     /**
      * Returns whether all elements of this stream match the provided predicate.
@@ -239,7 +239,7 @@ interface Pipeline
      *
      * @return boolean
      */
-    public function allMatch(callable $predicate) : boolean;
+    public function allMatch(callable $predicate) : bool;
 
     /**
      * Returns whether no elements of this stream match the provided predicate.
@@ -249,12 +249,13 @@ interface Pipeline
      *
      * @return boolean
      */
-    public function noneMatch(callable $predicate) : boolean;
+    public function noneMatch(callable $predicate) : bool;
 
     /**
-     * Returns the first element of this stream, or NULL If the stream is empty.
+     * Returns the first element of this stream that match the provided predicate,
+     * Returns NULL If can't find a match.
      *
-     * @return boolean
+     * @return mixed
      */
-    public function findFirst();
+    public function findFirst(callable $predicate = null);
 }

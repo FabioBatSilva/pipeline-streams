@@ -24,6 +24,8 @@ use ArrayObject;
 
 use Pipeline\Op\ForEachOp;
 use Pipeline\Op\ReduceOp;
+use Pipeline\Op\MatchOp;
+use Pipeline\Op\FindOp;
 
 use Pipeline\Sink\SortingSink;
 use Pipeline\Sink\MappingSink;
@@ -351,32 +353,32 @@ class ReferencePipeline extends BasePipeline
     /**
      * {@inheritdoc}
      */
-    public function anyMatch(callable $predicate) : boolean
+    public function anyMatch(callable $predicate) : bool
     {
-
+        return $this->evaluate(new MatchOp($predicate, MatchOp::ANY));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function allMatch(callable $predicate) : boolean
+    public function allMatch(callable $predicate) : bool
     {
-
+        return $this->evaluate(new MatchOp($predicate, MatchOp::ALL));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function noneMatch(callable $predicate) : boolean
+    public function noneMatch(callable $predicate) : bool
     {
-
+        return $this->evaluate(new MatchOp($predicate, MatchOp::NONE));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function findFirst()
+    public function findFirst(callable $predicate = null)
     {
-
+        return $this->evaluate(new FindOp($predicate));
     }
 }

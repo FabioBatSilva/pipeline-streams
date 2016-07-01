@@ -46,14 +46,6 @@ abstract class BaseSink implements Sink
     /**
      * {@inheritdoc}
      */
-    public function getOpFlags() : int
-    {
-        return 0;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function cancellationRequested() : bool
     {
         return false;

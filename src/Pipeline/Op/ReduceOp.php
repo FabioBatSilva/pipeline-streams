@@ -22,23 +22,28 @@ namespace Pipeline\Op;
 
 use Iterator;
 
-use Pipeline\BaseSink;
-use Pipeline\TerminalOp;
-use Pipeline\TerminalSink;
-use Pipeline\BasePipeline;
-use Pipeline\PipelineOpFlag;
+use Pipeline\BaseTerminalSink;
 
 /**
  * An operation in a stream pipeline that implement reductions.
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-class ReduceOp extends BaseSink implements TerminalOp, TerminalSink
+class ReduceOp extends BaseTerminalSink
 {
+    /**
+     * @var mixed
+     */
     private $state;
 
+    /**
+     * @var mixed
+     */
     private $identity;
 
+    /**
+     * @var callable
+     */
     private $accumulator;
 
     /**
@@ -51,14 +56,6 @@ class ReduceOp extends BaseSink implements TerminalOp, TerminalSink
     {
         $this->identity    = $identity;
         $this->accumulator = $accumulator;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function evaluate(BasePipeline $pipeline, Iterator $iterator)
-    {
-        return $pipeline->wrapAndCopyInto($this, $iterator)->get();
     }
 
     /**
@@ -82,6 +79,9 @@ class ReduceOp extends BaseSink implements TerminalOp, TerminalSink
      */
     public function accept($item)
     {
-        $this->state = call_user_func($this->accumulator, $item, $this->state);
+        $callable = $this->accumulator;
+        $state    = $callable($item, $this->state);
+
+        $this->state = $state;
     }
 }

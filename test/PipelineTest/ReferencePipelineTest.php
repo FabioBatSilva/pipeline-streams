@@ -131,6 +131,71 @@ class ReferencePipelineTest extends TestCase
         $this->assertEquals(10, $result);
     }
 
+    public function testFindFirst()
+    {
+        $iterator = new ArrayIterator([5, 4, 3, 2, 1]);
+        $pipeline = new ReferencePipeline($iterator);
+        $result   = $pipeline->findFirst();
+
+        $this->assertEquals(5, $result);
+    }
+
+    public function testFindFirstMatch()
+    {
+        $iterator = new ArrayIterator([5, 4, 3, 2, 1]);
+        $pipeline = new ReferencePipeline($iterator);
+        $result   = $pipeline->findFirst(function(int $e) {
+            return ($e < 5) && ($e % 2 != 0);
+        });
+
+        $this->assertEquals(3, $result);
+    }
+
+    public function testAnyMatch()
+    {
+        $iterator  = new ArrayIterator([5, 4, 3, 2, 1]);
+        $pipeline1 = new ReferencePipeline($iterator);
+        $pipeline2 = new ReferencePipeline($iterator);
+
+        $this->assertTrue($pipeline1->anyMatch(function(int $e) {
+            return $e === 3;
+        }));
+
+        $this->assertFalse($pipeline2->anyMatch(function(int $e) {
+            return $e === 10;
+        }));
+    }
+
+    public function testAllMatch()
+    {
+        $iterator  = new ArrayIterator([5, 4, 3, 2, 1]);
+        $pipeline1 = new ReferencePipeline($iterator);
+        $pipeline2 = new ReferencePipeline($iterator);
+
+        $this->assertTrue($pipeline1->allMatch(function(int $e) {
+            return $e < 10;
+        }));
+
+        $this->assertFalse($pipeline2->allMatch(function(int $e) {
+            return $e > 2;
+        }));
+    }
+
+    public function testNoneMatch()
+    {
+        $iterator  = new ArrayIterator([5, 4, 3, 2, 1]);
+        $pipeline1 = new ReferencePipeline($iterator);
+        $pipeline2 = new ReferencePipeline($iterator);
+
+        $this->assertTrue($pipeline1->noneMatch(function(int $e) {
+            return $e > 10;
+        }));
+
+        $this->assertFalse($pipeline2->noneMatch(function(int $e) {
+            return $e < 5;
+        }));
+    }
+
     public function testForEach()
     {
         $iterator = new ArrayIterator(array_reverse(range(0, 10)));

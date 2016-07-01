@@ -22,44 +22,39 @@ namespace Pipeline\Op;
 
 use Iterator;
 
-use Pipeline\PipelineOpFlag;
+use Pipeline\TerminalSink;
 use Pipeline\BaseTerminalSink;
 
 /**
- * An operation in a stream pipeline that takes a stream as input and produces a result or side-effect.
+ * An operation that searches for an element in a stream pipeline, and terminates when it finds one.
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-class ForEachOp extends BaseTerminalSink
+class FindOp extends BaseTerminalSink
 {
+    /**
+     * @var bool
+     */
+    private $hasValue = false;
+
     /**
      * @var callable
      */
-    private $consumer;
+    private $callable;
 
     /**
-     * @var boolean
+     * @var mixed
      */
-    private $ordered;
+    private $value;
 
     /**
      * Construct
      *
-     * @param callable $consumer
-     * @param boolean  $ordered
+     * @param callable $callable
      */
-    public function __construct(callable $consumer, bool $ordered)
+    public function __construct(callable $callable = null)
     {
-        $this->ordered  = $ordered;
-        $this->consumer = $consumer;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getOpFlags() : int
-    {
-        return $this->ordered ? 0 : PipelineOpFlag::NOT_ORDERED;
+        $this->callable = $callable;
     }
 
     /**
@@ -67,7 +62,16 @@ class ForEachOp extends BaseTerminalSink
      */
     public function get()
     {
-        return null;
+        return $this->value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function begin(int $size = null)
+    {
+        $this->value    = null;
+        $this->hasValue = false;
     }
 
     /**
@@ -75,6 +79,27 @@ class ForEachOp extends BaseTerminalSink
      */
     public function accept($item)
     {
-        call_user_func($this->consumer, $item);
+        if ($this->callable == null) {
+            $this->value    = $item;
+            $this->hasValue = true;
+
+            return;
+        }
+
+        $callable = $this->callable;
+        $result   = $callable($item);
+
+        if ($result === true) {
+            $this->value    = $item;
+            $this->hasValue = true;
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function cancellationRequested() : bool
+    {
+        return $this->hasValue;
     }
 }

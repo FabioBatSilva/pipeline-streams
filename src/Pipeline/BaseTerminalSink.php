@@ -18,40 +18,24 @@
 
 declare(strict_types=1);
 
-namespace Pipeline\Op;
+namespace Pipeline;
 
 use Iterator;
-
-use Pipeline\PipelineOpFlag;
-use Pipeline\BaseTerminalSink;
+use Pipeline\BasePipeline;
 
 /**
- * An operation in a stream pipeline that takes a stream as input and produces a result or side-effect.
+ * Base TerminalOp implementation
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-class ForEachOp extends BaseTerminalSink
+abstract class BaseTerminalSink extends BaseSink implements TerminalOp
 {
     /**
-     * @var callable
+     * {@inheritdoc}
      */
-    private $consumer;
-
-    /**
-     * @var boolean
-     */
-    private $ordered;
-
-    /**
-     * Construct
-     *
-     * @param callable $consumer
-     * @param boolean  $ordered
-     */
-    public function __construct(callable $consumer, bool $ordered)
+    public function evaluate(BasePipeline $pipeline, Iterator $iterator)
     {
-        $this->ordered  = $ordered;
-        $this->consumer = $consumer;
+        return $pipeline->wrapAndCopyInto($this, $iterator)->get();
     }
 
     /**
@@ -59,22 +43,14 @@ class ForEachOp extends BaseTerminalSink
      */
     public function getOpFlags() : int
     {
-        return $this->ordered ? 0 : PipelineOpFlag::NOT_ORDERED;
+        return 0;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function get()
+    public function cancellationRequested() : bool
     {
-        return null;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function accept($item)
-    {
-        call_user_func($this->consumer, $item);
+        return false;
     }
 }
