@@ -2,6 +2,7 @@
 
 namespace PipelineTest;
 
+use Iterator;
 use ArrayObject;
 use ArrayIterator;
 use Pipeline\Pipelines;
@@ -258,7 +259,8 @@ class PipelineTest extends TestCase
 
     public function testDistinct()
     {
-        $stream = Pipelines::of(1, 2, 2, 3, 4, 5, 5, 1);
+        $values   = [1, 2, 2, 3, 4, 5, 5, 1];
+        $stream   = Pipelines::wrap($values);
         $result = $stream->distinct()->toArray();
 
         $this->assertEquals([1, 2, 3, 4, 5], $result);
@@ -266,8 +268,10 @@ class PipelineTest extends TestCase
 
     public function testForEach()
     {
-        $stream = Pipelines::of(...array_reverse(range(0, 10)));
-        $result = new ArrayObject();
+        $values   = array_reverse(range(0, 10));
+        $iterator = new \ArrayIterator($values);
+        $stream   = Pipelines::wrap($iterator);
+        $result   = new ArrayObject();
 
         $stream
             ->sorted()
@@ -287,5 +291,42 @@ class PipelineTest extends TestCase
         $this->assertCount(2, $result);
         $this->assertEquals(4, $result[0]);
         $this->assertEquals(8, $result[1]);
+    }
+
+    public function testCountWorks()
+    {
+        $lines  = $this->readFileLines();
+        $result = Pipelines::wrap($lines)
+            ->filter(function(string $line) {
+                return strlen($line) > 1;
+            })
+            ->map(function(string $line) {
+                return trim(strtolower($line));
+            })
+            ->flatMap(function(string $line) {
+                return explode(' ', $line);
+            })
+            ->reduce(function (string $word, array $counters) {
+                if (!isset($counters[$word])) {
+                    $counters[$word] = 0;
+                }
+
+                $counters[$word] ++;
+
+                return $counters;
+            }, []);
+
+        $this->assertCount(100, $result);
+        $this->assertEquals(3, $result['copyright']);
+        $this->assertEquals(2, $result['permission']);
+    }
+
+    public function readFileLines() : Iterator
+    {
+        $file = new \SplFileObject(__DIR__ . '/../../LICENSE');
+
+        while ( ! $file->eof()) {
+            yield $file->fgets();
+        }
     }
 }

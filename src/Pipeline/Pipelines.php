@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace Pipeline;
 
+use Iterator;
 use ArrayIterator;
 
 /**
@@ -32,13 +33,10 @@ final class Pipelines
     /**
      * Construct
      */
-    private function __construct()
-    {
-
-    }
+    private function __construct() { }
 
     /**
-     * Returns a Collector containing the parameters as elements
+     * Returns a Stream containing the parameters as elements
      *
      * @param mixed $values,...
      *
@@ -51,4 +49,30 @@ final class Pipelines
 
         return $pipeline;
     }
+
+    /**
+     * Wrap the input values in a Stream object.
+     *
+     * @param array|\Iterator $source
+     *
+     * @return \Pipeline\Stream
+     *
+     * @throws \InvalidArgumentException if the $source arg is not valid.
+     */
+    public static function wrap($source)
+    {
+        if ($source instanceof Iterator) {
+            return Pipeline::head($source);
+        }
+
+        if (is_array($source)) {
+            return self::of(...$source);
+        }
+
+        throw new \InvalidArgumentException(sprintf(
+            'Invalid resource type: %s',
+            is_object($source) ? get_class($source) : gettype($source)
+        ));
+    }
+
 }

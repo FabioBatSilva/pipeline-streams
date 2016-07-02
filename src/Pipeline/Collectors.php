@@ -36,10 +36,7 @@ final class Collectors
     /**
      * Construct
      */
-    private function __construct()
-    {
-
-    }
+    private function __construct() { }
 
     /**
      * Returns a Collector that accumulates the input elements into a new array

@@ -32,3 +32,49 @@ Pipelines::of(range(0, 10))
     // int(4)
     // int(8)
 ```
+
+
+```php
+<?php
+
+function readFileLines(string $file) : Iterator
+{
+    $file = new \SplFileObject($file);
+
+    while ( ! $file->eof()) {
+        yield $file->fgets();
+    }
+}
+
+$lines  = $this->readFileLines('./LICENSE');
+$result = Pipelines::wrap($lines)
+    ->filter(function(string $line) {
+        return strlen($line) > 1;
+    })
+    ->map(function(string $line) {
+        return trim(strtolower($line));
+    })
+    ->flatMap(function(string $line) {
+        return explode(' ', $line);
+    })
+    ->reduce(function (string $word, array $counters) {
+        if (!isset($counters[$word])) {
+            $counters[$word] = 0;
+        }
+
+        $counters[$word] ++;
+
+        return $counters;
+    }, []);
+
+/*
+
+{
+    "copyright": 3,
+    "permission": 2,
+    "the": 13,
+    ....
+}
+
+*/
+```
