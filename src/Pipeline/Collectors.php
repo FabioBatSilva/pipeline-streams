@@ -20,6 +20,12 @@ declare(strict_types=1);
 
 namespace Pipeline;
 
+use Pipeline\Collector\SumCollector;
+use Pipeline\Collector\ArrayCollector;
+use Pipeline\Collector\MinMaxCollector;
+use Pipeline\Collector\AverageCollector;
+use Pipeline\Collector\GroupByCollector;
+
 /**
  * Implementations of Collector that implement various useful reduction operations
  *
@@ -42,20 +48,7 @@ final class Collectors
      */
     public static function asArray()
     {
-        return new class() implements Collector
-        {
-            private $values = [];
-
-            public function accept($item)
-            {
-                $this->values[] = $item;
-            }
-
-            public function get()
-            {
-                return $this->values;
-            }
-        };
+        return new ArrayCollector();
     }
 
     /**
@@ -66,20 +59,7 @@ final class Collectors
      */
     public static function summingNumbers()
     {
-        return new class() implements Collector
-        {
-            private $sum = 0;
-
-            public function accept($item)
-            {
-                $this->sum += $item;
-            }
-
-            public function get()
-            {
-                return $this->sum;
-            }
-        };
+        return new SumCollector();
     }
 
     /**
@@ -90,25 +70,7 @@ final class Collectors
      */
     public static function averagingNumbers()
     {
-        return new class() implements Collector
-        {
-            private $sum   = 0;
-            private $count = 0;
-
-            public function accept($item)
-            {
-                $this->sum += $item;
-
-                $this->count++;
-            }
-
-            public function get()
-            {
-                return $this->count > 0
-                    ? $this->sum / $this->count
-                    : 0;
-            }
-        };
+        return new AverageCollector();
     }
 
     /**
@@ -120,38 +82,7 @@ final class Collectors
      */
     public static function minBy(callable $comparator)
     {
-        return new class($comparator) implements Collector
-        {
-            private $min;
-
-            private $comparator;
-
-            public function __construct($comparator)
-            {
-                $this->comparator = $comparator;
-            }
-
-            public function accept($item)
-            {
-                if ($this->min === null) {
-                    $this->min = $item;
-
-                    return;
-                }
-
-                $comparator = $this->comparator;
-                $result     = $comparator($this->min, $item);
-
-                if ($result === 1) {
-                    $this->min = $item;
-                }
-            }
-
-            public function get()
-            {
-                return $this->min;
-            }
-        };
+        return new MinMaxCollector($comparator, MinMaxCollector::MIN);
     }
 
     /**
@@ -163,38 +94,7 @@ final class Collectors
      */
     public static function maxBy(callable $comparator)
     {
-        return new class($comparator) implements Collector
-        {
-            private $max;
-
-            private $comparator;
-
-            public function __construct($comparator)
-            {
-                $this->comparator = $comparator;
-            }
-
-            public function accept($item)
-            {
-                if ($this->max === null) {
-                    $this->max = $item;
-
-                    return;
-                }
-
-                $comparator = $this->comparator;
-                $result     = $comparator($this->max, $item);
-
-                if ($result === -1) {
-                    $this->max = $item;
-                }
-            }
-
-            public function get()
-            {
-                return $this->max;
-            }
-        };
+        return new MinMaxCollector($comparator, MinMaxCollector::MAX);
     }
 
     /**
@@ -207,29 +107,6 @@ final class Collectors
      */
     public static function groupingBy(callable $classifier)
     {
-        return new class($classifier) implements Collector
-        {
-            private $values = [];
-
-            private $classifier;
-
-            public function __construct($classifier)
-            {
-                $this->classifier = $classifier;
-            }
-
-            public function accept($item)
-            {
-                $callable = $this->classifier;
-                $itemKey  = $callable($item);
-
-                $this->values[$itemKey][] = $item;
-            }
-
-            public function get()
-            {
-                return $this->values;
-            }
-        };
+        return new GroupByCollector($classifier);
     }
 }

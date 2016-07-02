@@ -27,7 +27,7 @@ use Pipeline\Sink;
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-class SliceSink extends ChainSink
+final class SliceSink extends ChainSink
 {
     /**
      * @var callable

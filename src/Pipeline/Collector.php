@@ -29,6 +29,11 @@ namespace Pipeline;
 interface Collector
 {
     /**
+     * Resets the sink state to receive a fresh data set.
+     */
+    public function begin();
+
+    /**
      * Accumulates a input element
      *
      * @param mixed $item The input argument

@@ -18,32 +18,29 @@
 
 declare(strict_types=1);
 
-namespace Pipeline\Sink;
+namespace Pipeline\Collector;
 
-use Pipeline\Sink;
+use Pipeline\Collector;
 
 /**
- * A Sink for mapping stream values.
+ * Collector that produces the sum of a numbers,
+ * If no elements are present, the result is 0.
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-final class MapSink extends ChainSink
+final class SumCollector implements Collector
 {
     /**
-     * @var callable
+     * @var int|float
      */
-    private $callable;
+    private $sum;
 
     /**
-     * Constructor.
-     *
-     * @param \Pipeline\Sink $downstream
-     * @param callable       $action
+     * {@inheritdoc}
      */
-    public function __construct(Sink $downstream, callable $callable)
+    public function begin()
     {
-        $this->downstream = $downstream;
-        $this->callable   = $callable;
+        $this->sum = 0;
     }
 
     /**
@@ -51,9 +48,18 @@ final class MapSink extends ChainSink
      */
     public function accept($item)
     {
-        $callable = $this->callable;
-        $result   = $callable($item);
+        $this->sum += $item;
+    }
 
-        $this->downstream->accept($result);
+    /**
+     * {@inheritdoc}
+     */
+    public function get()
+    {
+        $result = $this->sum;
+
+        $this->sum = null;
+
+        return $result;
     }
 }

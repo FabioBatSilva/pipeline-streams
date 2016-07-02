@@ -27,7 +27,7 @@ use Iterator;
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-class ForEachOp extends BaseTerminalOp
+final class ForEachOp extends BaseTerminalOp
 {
     /**
      * @var callable

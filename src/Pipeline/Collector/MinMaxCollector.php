@@ -18,26 +18,31 @@
 
 declare(strict_types=1);
 
-namespace Pipeline\Op;
+namespace Pipeline\Collector;
 
-use Iterator;
+use Pipeline\Collector;
 
 /**
- * An operation that searches for an element in a stream pipeline, and terminates when it finds one.
+ * Collector that produces the minimal/maximal element according to a given comparator.
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-final class FindOp extends BaseTerminalOp
+final class MinMaxCollector implements Collector
 {
     /**
-     * @var bool
+     * produces the minimal element
      */
-    private $hasValue = false;
+    const MIN = 1;
 
     /**
-     * @var callable
+     * produces the maximal element
      */
-    private $callable;
+    const MAX = -1;
+
+    /**
+     * @var int
+     */
+    private $type;
 
     /**
      * @var mixed
@@ -45,27 +50,26 @@ final class FindOp extends BaseTerminalOp
     private $value;
 
     /**
+     * @var bool
+     */
+    private $hasValue;
+
+    /**
      * Construct
      *
-     * @param callable $callable
+     * @param callable $comparator
+     * @param int      $type
      */
-    public function __construct(callable $callable = null)
+    public function __construct(callable $comparator, int $type)
     {
-        $this->callable = $callable;
+        $this->comparator = $comparator;
+        $this->type       = $type;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function get()
-    {
-        return $this->value;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function begin(int $size = null)
+    public function begin()
     {
         $this->value    = null;
         $this->hasValue = false;
@@ -76,27 +80,31 @@ final class FindOp extends BaseTerminalOp
      */
     public function accept($item)
     {
-        if ($this->callable == null) {
+        if ( ! $this->hasValue) {
             $this->value    = $item;
             $this->hasValue = true;
 
             return;
         }
 
-        $callable = $this->callable;
-        $result   = $callable($item);
+        $comparator = $this->comparator;
+        $result     = $comparator($this->value, $item);
 
-        if ($result === true) {
-            $this->value    = $item;
-            $this->hasValue = true;
+        if ($result === $this->type) {
+            $this->value = $item;
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function cancellationRequested() : bool
+    public function get()
     {
-        return $this->hasValue;
+        $result = $this->value;
+
+        $this->value    = null;
+        $this->hasValue = null;
+
+        return $result;
     }
 }

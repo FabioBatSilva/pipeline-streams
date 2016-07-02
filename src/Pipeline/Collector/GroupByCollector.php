@@ -18,32 +18,41 @@
 
 declare(strict_types=1);
 
-namespace Pipeline\Sink;
+namespace Pipeline\Collector;
 
-use Pipeline\Sink;
+use Pipeline\Collector;
 
 /**
- * A Sink for mapping stream values.
+ * Collector implementing a "group by" operation on input elements.
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-final class MapSink extends ChainSink
+final class GroupByCollector implements Collector
 {
+    /**
+     * @var array
+     */
+    private $values;
+
     /**
      * @var callable
      */
-    private $callable;
+    private $classifier;
 
     /**
-     * Constructor.
-     *
-     * @param \Pipeline\Sink $downstream
-     * @param callable       $action
+     * @param callable $classifier
      */
-    public function __construct(Sink $downstream, callable $callable)
+    public function __construct(callable $classifier)
     {
-        $this->downstream = $downstream;
-        $this->callable   = $callable;
+        $this->classifier = $classifier;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function begin()
+    {
+        $this->values = [];
     }
 
     /**
@@ -51,9 +60,21 @@ final class MapSink extends ChainSink
      */
     public function accept($item)
     {
-        $callable = $this->callable;
-        $result   = $callable($item);
+        $callable = $this->classifier;
+        $itemKey  = $callable($item);
 
-        $this->downstream->accept($result);
+        $this->values[$itemKey][] = $item;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function get()
+    {
+        $result = $this->values;
+
+        $this->values = null;
+
+        return $result;
     }
 }

@@ -9,7 +9,7 @@ use Pipeline\Collector;
 use Pipeline\Collectors;
 use Pipeline\ReferencePipeline;
 
-class ReferencePipelineTest extends TestCase
+class PipelineTest extends TestCase
 {
     public function testReducePipeline()
     {

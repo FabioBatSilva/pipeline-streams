@@ -47,7 +47,7 @@ final class Pipelines
     public static function of(...$values)
     {
         $iterator = new ArrayIterator($values);
-        $pipeline = new ReferencePipeline($iterator);
+        $pipeline = Pipeline::head($iterator);
 
         return $pipeline;
     }

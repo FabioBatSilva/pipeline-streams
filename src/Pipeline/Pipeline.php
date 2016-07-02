@@ -20,6 +20,8 @@ declare(strict_types=1);
 
 namespace Pipeline;
 
+use Iterator;
+
 use Pipeline\Op\FindOp;
 use Pipeline\Op\MatchOp;
 use Pipeline\Op\ReduceOp;
@@ -35,22 +37,32 @@ use Pipeline\Sink\FlatMapSink;
 use Pipeline\Sink\DistinctSink;
 
 /**
- * Implements a pipeline stage or pipeline source stage implementing whose elements are of any type.
+ * Implements a stream stage or stream source stage implementing whose elements are of any type.
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-class ReferencePipeline extends BaseStream
+class Pipeline extends BaseStream
 {
+    /**
+     * Create a source stage of a Pipeline.
+     *
+     * @param \Iterator $source
+     */
+    public static function head(Iterator $source) : Pipeline
+    {
+        return new Pipeline($source);
+    }
+
     /**
      * {@inheritdoc}
      */
     public function filter(callable $predicate) : Stream
     {
-        return new class($this, $predicate) extends ReferencePipeline
+        return new class($this, $predicate) extends Pipeline
         {
             private $callable;
 
-            public function __construct($self, $callable)
+            protected function __construct($self, $callable)
             {
                 $this->sourceStage   = $self->sourceStage;
                 $this->callable      = $callable;
@@ -69,11 +81,11 @@ class ReferencePipeline extends BaseStream
      */
     public function map(callable $mapper) : Stream
     {
-        return new class($this, $mapper) extends ReferencePipeline
+        return new class($this, $mapper) extends Pipeline
         {
             private $callable;
 
-            public function __construct($self, $callable)
+            protected function __construct($self, $callable)
             {
                 $this->sourceStage   = $self->sourceStage;
                 $this->callable      = $callable;
@@ -96,7 +108,7 @@ class ReferencePipeline extends BaseStream
         {
             private $callable;
 
-            public function __construct($self, $callable)
+            protected function __construct($self, $callable)
             {
                 $this->sourceStage   = $self->sourceStage;
                 $this->callable      = $callable;
@@ -115,11 +127,11 @@ class ReferencePipeline extends BaseStream
      */
     public function flatMap(callable $mapper) : Stream
     {
-        return new class($this, $mapper) extends ReferencePipeline
+        return new class($this, $mapper) extends Pipeline
         {
             private $callable;
 
-            public function __construct($self, $callable)
+            protected function __construct($self, $callable)
             {
                 $this->sourceStage   = $self->sourceStage;
                 $this->callable      = $callable;
@@ -142,7 +154,7 @@ class ReferencePipeline extends BaseStream
         {
             private $callable;
 
-            public function __construct($self, $callable)
+            protected function __construct($self, $callable)
             {
                 $this->sourceStage   = $self->sourceStage;
                 $this->callable      = $callable;
@@ -161,9 +173,9 @@ class ReferencePipeline extends BaseStream
      */
     public function distinct() : Stream
     {
-        return new class($this) extends ReferencePipeline
+        return new class($this) extends Pipeline
         {
-            public function __construct($self)
+            protected function __construct($self)
             {
                 $this->sourceStage   = $self->sourceStage;
                 $this->previousStage = $self;
@@ -181,11 +193,11 @@ class ReferencePipeline extends BaseStream
      */
     public function sorted(callable $comparator = null) : Stream
     {
-        return new class($this, $comparator) extends ReferencePipeline
+        return new class($this, $comparator) extends Pipeline
         {
             private $callable;
 
-            public function __construct($self, $callable)
+            protected function __construct($self, $callable)
             {
                 $this->sourceStage   = $self->sourceStage;
                 $this->callable      = $callable;
@@ -204,11 +216,11 @@ class ReferencePipeline extends BaseStream
      */
     public function peek(callable $action) : Stream
     {
-        return new class($this, $action) extends ReferencePipeline
+        return new class($this, $action) extends Pipeline
         {
             private $callable;
 
-            public function __construct($self, $callable)
+            protected function __construct($self, $callable)
             {
                 $this->sourceStage   = $self->sourceStage;
                 $this->callable      = $callable;
@@ -227,11 +239,11 @@ class ReferencePipeline extends BaseStream
      */
     public function limit(int $maxSize) : Stream
     {
-        return new class($this, $maxSize) extends ReferencePipeline
+        return new class($this, $maxSize) extends Pipeline
         {
             private $maxSize;
 
-            public function __construct($self, $maxSize)
+            protected function __construct($self, $maxSize)
             {
                 $this->sourceStage   = $self->sourceStage;
                 $this->maxSize       = $maxSize;
@@ -250,11 +262,11 @@ class ReferencePipeline extends BaseStream
      */
     public function skip(int $skip) : Stream
     {
-        return new class($this, $skip) extends ReferencePipeline
+        return new class($this, $skip) extends Pipeline
         {
             private $skip;
 
-            public function __construct($self, $skip)
+            protected function __construct($self, $skip)
             {
                 $this->sourceStage   = $self->sourceStage;
                 $this->previousStage = $self;

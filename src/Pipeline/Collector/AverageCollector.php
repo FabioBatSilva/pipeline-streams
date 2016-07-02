@@ -18,32 +18,34 @@
 
 declare(strict_types=1);
 
-namespace Pipeline\Sink;
+namespace Pipeline\Collector;
 
-use Pipeline\Sink;
+use Pipeline\Collector;
 
 /**
- * A Sink for mapping stream values.
+ * Collector that produces the arithmetic mean.
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-final class MapSink extends ChainSink
+final class AverageCollector implements Collector
 {
     /**
-     * @var callable
+     * @var int|float
      */
-    private $callable;
+    private $sum;
 
     /**
-     * Constructor.
-     *
-     * @param \Pipeline\Sink $downstream
-     * @param callable       $action
+     * @var int
      */
-    public function __construct(Sink $downstream, callable $callable)
+    private $count;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function begin()
     {
-        $this->downstream = $downstream;
-        $this->callable   = $callable;
+        $this->sum   = 0;
+        $this->count = 0;
     }
 
     /**
@@ -51,9 +53,22 @@ final class MapSink extends ChainSink
      */
     public function accept($item)
     {
-        $callable = $this->callable;
-        $result   = $callable($item);
+        $this->sum   += $item;
+        $this->count += 1;
+    }
 
-        $this->downstream->accept($result);
+    /**
+     * {@inheritdoc}
+     */
+    public function get()
+    {
+        $result = ($this->count > 0)
+            ? ($this->sum / $this->count)
+            : 0;
+
+        $this->sum   = null;
+        $this->count = null;
+
+        return $result;
     }
 }

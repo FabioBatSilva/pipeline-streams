@@ -18,32 +18,28 @@
 
 declare(strict_types=1);
 
-namespace Pipeline\Sink;
+namespace Pipeline\Collector;
 
-use Pipeline\Sink;
+use Pipeline\Collector;
 
 /**
- * A Sink for mapping stream values.
+ * Collector that accumulates the input elements into a new array
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-final class MapSink extends ChainSink
+final class ArrayCollector implements Collector
 {
     /**
-     * @var callable
+     * @var array
      */
-    private $callable;
+    private $values;
 
     /**
-     * Constructor.
-     *
-     * @param \Pipeline\Sink $downstream
-     * @param callable       $action
+     * {@inheritdoc}
      */
-    public function __construct(Sink $downstream, callable $callable)
+    public function begin()
     {
-        $this->downstream = $downstream;
-        $this->callable   = $callable;
+        $this->values = [];
     }
 
     /**
@@ -51,9 +47,18 @@ final class MapSink extends ChainSink
      */
     public function accept($item)
     {
-        $callable = $this->callable;
-        $result   = $callable($item);
+        $this->values[] = $item;
+    }
 
-        $this->downstream->accept($result);
+    /**
+     * {@inheritdoc}
+     */
+    public function get()
+    {
+        $result = $this->values;
+
+        $this->values = null;
+
+        return $result;
     }
 }

@@ -29,7 +29,7 @@ use Pipeline\Collector;
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-class CollectOp extends BaseTerminalOp
+final class CollectOp extends BaseTerminalOp
 {
     /**
      * @var \Pipeline\Collector
@@ -49,9 +49,9 @@ class CollectOp extends BaseTerminalOp
     /**
      * {@inheritdoc}
      */
-    public function get()
+    public function begin()
     {
-        return $this->collector->get();
+        return $this->collector->begin();
     }
 
     /**
@@ -60,5 +60,13 @@ class CollectOp extends BaseTerminalOp
     public function accept($item)
     {
         $this->collector->accept($item);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function get()
+    {
+        return $this->collector->get();
     }
 }

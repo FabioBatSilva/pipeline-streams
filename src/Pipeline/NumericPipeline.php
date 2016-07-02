@@ -41,7 +41,7 @@ use Pipeline\Sink\ChainedReference;
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-class NumericPipeline extends ReferencePipeline implements NumericStream
+class NumericPipeline extends Pipeline implements NumericStream
 {
     /**
      * {@inheritdoc}

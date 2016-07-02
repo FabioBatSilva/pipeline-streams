@@ -65,7 +65,7 @@ abstract class BaseStream implements Stream
      *
      * @param \Iterator $source
      */
-    public function __construct(Iterator $source)
+    protected function __construct(Iterator $source)
     {
         $this->source      = $source;
         $this->sourceStage = $this;

@@ -27,7 +27,7 @@ use Iterator;
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-class ReduceOp extends BaseTerminalOp
+final class ReduceOp extends BaseTerminalOp
 {
     /**
      * @var mixed

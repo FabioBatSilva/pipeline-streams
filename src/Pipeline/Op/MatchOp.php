@@ -29,7 +29,7 @@ use Iterator;
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-class MatchOp extends BaseTerminalOp
+final class MatchOp extends BaseTerminalOp
 {
     /**
      * Do all elements match the predicate?

@@ -27,7 +27,7 @@ use Pipeline\Sink;
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-class FlatMapSink extends ChainSink
+final class FlatMapSink extends ChainSink
 {
     /**
      * @var callable

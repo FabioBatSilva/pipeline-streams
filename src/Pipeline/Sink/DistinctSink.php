@@ -27,7 +27,7 @@ use Pipeline\Sink;
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-class DistinctSink extends ChainSink
+final class DistinctSink extends ChainSink
 {
     /**
      * @var array
