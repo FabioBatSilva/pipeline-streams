@@ -4,6 +4,7 @@ This library support functional-style operations on streams of elements, such as
 
 
 [![Build Status](https://travis-ci.org/FabioBatSilva/pipeline-streams.svg?branch=master)](https://travis-ci.org/FabioBatSilva/pipeline-streams)
+[![Coverage Status](https://coveralls.io/repos/github/FabioBatSilva/pipeline-streams/badge.svg?branch=master)](https://coveralls.io/github/FabioBatSilva/pipeline-streams?branch=master)
 
 ### Installation
 
