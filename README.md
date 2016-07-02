@@ -8,7 +8,7 @@ This library support functional-style operations on streams of elements, such as
 ### Installation
 
 ```sh
-composer require pipeline/streams
+composer require pipeline-streams/pipeline-streams
 ```
 
 
@@ -68,13 +68,11 @@ $result = Pipelines::wrap($lines)
     }, []);
 
 /*
-
 {
     "copyright": 3,
     "permission": 2,
     "the": 13,
     ....
 }
-
 */
 ```
