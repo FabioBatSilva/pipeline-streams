@@ -23,25 +23,39 @@ namespace Pipeline\Sink;
 use Pipeline\Sink;
 
 /**
- * A Sink for implementing uniqueness on streams.
+ * A Sink for slicing a stream.
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-class DistinguishSink extends ChainedReference
+class SliceSink extends ChainSink
 {
     /**
-     * @var array
+     * @var callable
      */
-    private $values;
+    private $skip;
+
+    /**
+     * @var callable
+     */
+    private $limit;
+
+    /**
+     * @var integer
+     */
+    private $offset = 0;
 
     /**
      * Constructor.
      *
      * @param \Pipeline\Sink $downstream
+     * @param int            $skip
+     * @param int            $limit
      */
-    public function __construct(Sink $downstream)
+    public function __construct(Sink $downstream, int $skip = null, int $limit = null)
     {
         $this->downstream = $downstream;
+        $this->limit      = $limit;
+        $this->skip       = $skip;
     }
 
     /**
@@ -49,7 +63,9 @@ class DistinguishSink extends ChainedReference
      */
     public function begin()
     {
-        $this->values = [];
+        $this->offset = 0;
+
+        $this->downstream->begin();
     }
 
     /**
@@ -57,11 +73,24 @@ class DistinguishSink extends ChainedReference
      */
     public function accept($item)
     {
-        if (in_array($item, $this->values, true)) {
+        $this->offset ++;
+
+        if ($this->skip !== null && $this->offset <= $this->skip) {
             return;
         }
 
-        $this->values[] = $item;
+        if ($this->limit !== null && $this->offset > $this->limit) {
+            return;
+        }
+
         $this->downstream->accept($item);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function cancellationRequested() : bool
+    {
+        return ($this->limit !== null && $this->offset > $this->limit);
     }
 }

@@ -110,4 +110,106 @@ final class Collectors
             }
         };
     }
+
+    /**
+     * Returns a Collector that produces the minimal element according to a given comparator.
+     *
+     * @param callable $comparator
+     *
+     * @return \Pipeline\Collector
+     */
+    public static function minBy(callable $comparator)
+    {
+        return new class($comparator) implements Collector
+        {
+            private $min;
+
+            private $comparator;
+
+            public function __construct($comparator)
+            {
+                $this->comparator = $comparator;
+            }
+
+            public function accept($item)
+            {
+                if ($this->min === null) {
+                    $this->min = $item;
+
+                    return;
+                }
+
+                $comparator = $this->comparator;
+                $result     = $comparator($this->min, $item);
+
+                if ($result === 1) {
+                    $this->min = $item;
+                }
+            }
+
+            public function get()
+            {
+                return $this->min;
+            }
+        };
+    }
+
+    /**
+     * Returns a Collector that produces the maximal element according to a given comparator.
+     *
+     * @param callable $comparator
+     *
+     * @return \Pipeline\Collector
+     */
+    public static function maxBy(callable $comparator)
+    {
+        return new class($comparator) implements Collector
+        {
+            private $max;
+
+            private $comparator;
+
+            public function __construct($comparator)
+            {
+                $this->comparator = $comparator;
+            }
+
+            public function accept($item)
+            {
+                if ($this->max === null) {
+                    $this->max = $item;
+
+                    return;
+                }
+
+                $comparator = $this->comparator;
+                $result     = $comparator($this->max, $item);
+
+                if ($result === -1) {
+                    $this->max = $item;
+                }
+            }
+
+            public function get()
+            {
+                return $this->max;
+            }
+        };
+    }
+
+    /**
+     * Returns a callable comparator.
+     *
+     * @return callable
+     */
+    public static function defaultComparator() : callable
+    {
+        return function ($a, $b) {
+            if ($a === $b) {
+                return 0;
+            }
+
+            return ($a < $b) ? -1 : 1;
+        };
+    }
 }

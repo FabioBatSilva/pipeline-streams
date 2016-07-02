@@ -4,14 +4,14 @@ namespace PipelineTest;
 
 use PipelineTest\TestCase;
 
-use Pipeline\Sink\ChainedReference;
+use Pipeline\Sink\ChainSink;
 
-class ChainedReferenceTest extends TestCase
+class ChainSinkTest extends TestCase
 {
     public function testChainInvocations()
     {
         $sink  = $this->createMock('Pipeline\Sink');
-        $chain = new ChainedReference($sink);
+        $chain = new ChainSink($sink);
 
         $sink
             ->expects($this->once())

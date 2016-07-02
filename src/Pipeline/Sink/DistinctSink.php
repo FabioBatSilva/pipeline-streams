@@ -23,16 +23,16 @@ namespace Pipeline\Sink;
 use Pipeline\Sink;
 
 /**
- * A Sink implementation for creating chains of sinks.
+ * A Sink for implementing uniqueness on streams.
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-class ChainedReference implements Sink
+class DistinctSink extends ChainSink
 {
     /**
-     * @var \Pipeline\Sink
+     * @var array
      */
-    protected $downstream;
+    private $values;
 
     /**
      * Constructor.
@@ -44,13 +44,12 @@ class ChainedReference implements Sink
         $this->downstream = $downstream;
     }
 
-
     /**
      * {@inheritdoc}
      */
     public function begin()
     {
-        $this->downstream->begin();
+        $this->values = [];
     }
 
     /**
@@ -58,22 +57,11 @@ class ChainedReference implements Sink
      */
     public function accept($item)
     {
+        if (in_array($item, $this->values, true)) {
+            return;
+        }
+
+        $this->values[] = $item;
         $this->downstream->accept($item);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function end()
-    {
-        $this->downstream->end();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function cancellationRequested() : bool
-    {
-        return $this->downstream->cancellationRequested();
     }
 }

@@ -23,11 +23,11 @@ namespace Pipeline\Sink;
 use Pipeline\Sink;
 
 /**
- * A Sink for invoking a callback with values in a stream.
+ * A Sink for filtering values in a stream.
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-class InvokingSink extends ChainedReference
+class FilterSink extends ChainSink
 {
     /**
      * @var callable
@@ -52,9 +52,10 @@ class InvokingSink extends ChainedReference
     public function accept($item)
     {
         $callable = $this->callable;
+        $result   = $callable($item);
 
-        $callable($item);
-
-        $this->downstream->accept($item);
+        if ($result === true) {
+            $this->downstream->accept($item);;
+        }
     }
 }

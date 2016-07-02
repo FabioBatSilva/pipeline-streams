@@ -23,27 +23,34 @@ namespace Pipeline\Sink;
 use Pipeline\Sink;
 
 /**
- * A Sink for flattening values in a stream.
+ * A Sink implementation for creating chains of sinks.
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-class FlatMappingSink extends ChainedReference
+class ChainSink implements Sink
 {
     /**
-     * @var callable
+     * @var \Pipeline\Sink
      */
-    private $callable;
+    protected $downstream;
 
     /**
      * Constructor.
      *
      * @param \Pipeline\Sink $downstream
-     * @param callable       $action
      */
-    public function __construct(Sink $downstream, callable $callable)
+    public function __construct(Sink $downstream)
     {
         $this->downstream = $downstream;
-        $this->callable   = $callable;
+    }
+
+
+    /**
+     * {@inheritdoc}
+     */
+    public function begin()
+    {
+        $this->downstream->begin();
     }
 
     /**
@@ -51,15 +58,22 @@ class FlatMappingSink extends ChainedReference
      */
     public function accept($item)
     {
-        $callable = $this->callable;
-        $result   = $callable($item);
+        $this->downstream->accept($item);
+    }
 
-        if ($result === null) {
-            return;
-        }
+    /**
+     * {@inheritdoc}
+     */
+    public function end()
+    {
+        $this->downstream->end();
+    }
 
-        foreach ($result as $value) {
-            $this->downstream->accept($value);
-        }
+    /**
+     * {@inheritdoc}
+     */
+    public function cancellationRequested() : bool
+    {
+        return $this->downstream->cancellationRequested();
     }
 }

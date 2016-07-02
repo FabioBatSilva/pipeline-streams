@@ -23,11 +23,11 @@ namespace Pipeline\Sink;
 use Pipeline\Sink;
 
 /**
- * A Sink for filtering values in a stream.
+ * A Sink for flattening values in a stream.
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-class FilteringSink extends ChainedReference
+class FlatMapSink extends ChainSink
 {
     /**
      * @var callable
@@ -38,7 +38,7 @@ class FilteringSink extends ChainedReference
      * Constructor.
      *
      * @param \Pipeline\Sink $downstream
-     * @param callable       $callable
+     * @param callable       $action
      */
     public function __construct(Sink $downstream, callable $callable)
     {
@@ -54,8 +54,12 @@ class FilteringSink extends ChainedReference
         $callable = $this->callable;
         $result   = $callable($item);
 
-        if ($result === true) {
-            $this->downstream->accept($item);;
+        if ($result === null) {
+            return;
+        }
+
+        foreach ($result as $value) {
+            $this->downstream->accept($value);
         }
     }
 }

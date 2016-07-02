@@ -23,49 +23,27 @@ namespace Pipeline\Sink;
 use Pipeline\Sink;
 
 /**
- * A Sink for slicing a stream.
+ * A Sink for mapping stream values.
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-class SlicingSink extends ChainedReference
+class MapSink extends ChainSink
 {
     /**
      * @var callable
      */
-    private $skip;
-
-    /**
-     * @var callable
-     */
-    private $limit;
-
-    /**
-     * @var integer
-     */
-    private $offset = 0;
+    private $callable;
 
     /**
      * Constructor.
      *
      * @param \Pipeline\Sink $downstream
-     * @param int            $skip
-     * @param int            $limit
+     * @param callable       $action
      */
-    public function __construct(Sink $downstream, int $skip = null, int $limit = null)
+    public function __construct(Sink $downstream, callable $callable)
     {
         $this->downstream = $downstream;
-        $this->limit      = $limit;
-        $this->skip       = $skip;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function begin()
-    {
-        $this->offset = 0;
-
-        $this->downstream->begin();
+        $this->callable   = $callable;
     }
 
     /**
@@ -73,24 +51,9 @@ class SlicingSink extends ChainedReference
      */
     public function accept($item)
     {
-        $this->offset ++;
+        $callable = $this->callable;
+        $result   = $callable($item);
 
-        if ($this->skip !== null && $this->offset <= $this->skip) {
-            return;
-        }
-
-        if ($this->limit !== null && $this->offset > $this->limit) {
-            return;
-        }
-
-        $this->downstream->accept($item);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function cancellationRequested() : bool
-    {
-        return ($this->limit !== null && $this->offset > $this->limit);
+        $this->downstream->accept($result);
     }
 }

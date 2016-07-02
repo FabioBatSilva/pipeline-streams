@@ -23,11 +23,11 @@ namespace Pipeline\Sink;
 use Pipeline\Sink;
 
 /**
- * A Sink for mapping stream values.
+ * A Sink for invoking a callback with values in a stream.
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-class MappingSink extends ChainedReference
+class InvokeSink extends ChainSink
 {
     /**
      * @var callable
@@ -38,7 +38,7 @@ class MappingSink extends ChainedReference
      * Constructor.
      *
      * @param \Pipeline\Sink $downstream
-     * @param callable       $action
+     * @param callable       $callable
      */
     public function __construct(Sink $downstream, callable $callable)
     {
@@ -52,8 +52,9 @@ class MappingSink extends ChainedReference
     public function accept($item)
     {
         $callable = $this->callable;
-        $result   = $callable($item);
 
-        $this->downstream->accept($result);
+        $callable($item);
+
+        $this->downstream->accept($item);
     }
 }

@@ -20,28 +20,26 @@ declare(strict_types=1);
 
 namespace Pipeline;
 
-use ArrayObject;
-
-use Pipeline\Op\ForEachOp;
-use Pipeline\Op\CollectOp;
-use Pipeline\Op\ReduceOp;
-use Pipeline\Op\MatchOp;
 use Pipeline\Op\FindOp;
+use Pipeline\Op\MatchOp;
+use Pipeline\Op\ReduceOp;
+use Pipeline\Op\CollectOp;
+use Pipeline\Op\ForEachOp;
 
-use Pipeline\Sink\SortingSink;
-use Pipeline\Sink\MappingSink;
-use Pipeline\Sink\SlicingSink;
-use Pipeline\Sink\InvokingSink;
-use Pipeline\Sink\FilteringSink;
-use Pipeline\Sink\FlatMappingSink;
-use Pipeline\Sink\DistinguishSink;
+use Pipeline\Sink\MapSink;
+use Pipeline\Sink\SortSink;
+use Pipeline\Sink\SliceSink;
+use Pipeline\Sink\InvokeSink;
+use Pipeline\Sink\FilterSink;
+use Pipeline\Sink\FlatMapSink;
+use Pipeline\Sink\DistinctSink;
 
 /**
  * Implements a pipeline stage or pipeline source stage implementing whose elements are of any type.
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-class ReferencePipeline extends BasePipeline
+class ReferencePipeline extends BaseStream
 {
     /**
      * {@inheritdoc}
@@ -52,16 +50,16 @@ class ReferencePipeline extends BasePipeline
         {
             private $callable;
 
-            public function __construct($source, $callable)
+            public function __construct($self, $callable)
             {
-                parent::__construct($source);
-
-                $this->callable = $callable;
+                $this->sourceStage   = $self->sourceStage;
+                $this->callable      = $callable;
+                $this->previousStage = $self;
             }
 
             protected function opWrapSink(Sink $sink) : Sink
             {
-                return new FilteringSink($sink, $this->callable);
+                return new FilterSink($sink, $this->callable);
             }
         };
     }
@@ -75,16 +73,16 @@ class ReferencePipeline extends BasePipeline
         {
             private $callable;
 
-            public function __construct($source, $callable)
+            public function __construct($self, $callable)
             {
-                parent::__construct($source);
-
-                $this->callable = $callable;
+                $this->sourceStage   = $self->sourceStage;
+                $this->callable      = $callable;
+                $this->previousStage = $self;
             }
 
             protected function opWrapSink(Sink $sink) : Sink
             {
-                return new MappingSink($sink, $this->callable);
+                return new MapSink($sink, $this->callable);
             }
         };
     }
@@ -98,16 +96,16 @@ class ReferencePipeline extends BasePipeline
         {
             private $callable;
 
-            public function __construct($source, $callable)
+            public function __construct($self, $callable)
             {
-                parent::__construct($source);
-
-                $this->callable = $callable;
+                $this->sourceStage   = $self->sourceStage;
+                $this->callable      = $callable;
+                $this->previousStage = $self;
             }
 
             protected function opWrapSink(Sink $sink) : Sink
             {
-                return new MappingSink($sink, $this->callable);
+                return new MapSink($sink, $this->callable);
             }
         };
     }
@@ -121,16 +119,16 @@ class ReferencePipeline extends BasePipeline
         {
             private $callable;
 
-            public function __construct($source, $callable)
+            public function __construct($self, $callable)
             {
-                parent::__construct($source);
-
-                $this->callable = $callable;
+                $this->sourceStage   = $self->sourceStage;
+                $this->callable      = $callable;
+                $this->previousStage = $self;
             }
 
             protected function opWrapSink(Sink $sink) : Sink
             {
-                return new FlatMappingSink($sink, $this->callable);
+                return new FlatMapSink($sink, $this->callable);
             }
         };
     }
@@ -144,16 +142,16 @@ class ReferencePipeline extends BasePipeline
         {
             private $callable;
 
-            public function __construct($source, $callable)
+            public function __construct($self, $callable)
             {
-                parent::__construct($source);
-
-                $this->callable = $callable;
+                $this->sourceStage   = $self->sourceStage;
+                $this->callable      = $callable;
+                $this->previousStage = $self;
             }
 
             protected function opWrapSink(Sink $sink) : Sink
             {
-                return new FlatMappingSink($sink, $this->callable);
+                return new FlatMapSink($sink, $this->callable);
             }
         };
     }
@@ -165,9 +163,15 @@ class ReferencePipeline extends BasePipeline
     {
         return new class($this) extends ReferencePipeline
         {
+            public function __construct($self)
+            {
+                $this->sourceStage   = $self->sourceStage;
+                $this->previousStage = $self;
+            }
+
             protected function opWrapSink(Sink $sink) : Sink
             {
-                return new DistinguishSink($sink);
+                return new DistinctSink($sink);
             }
         };
     }
@@ -181,16 +185,16 @@ class ReferencePipeline extends BasePipeline
         {
             private $callable;
 
-            public function __construct($source, $callable)
+            public function __construct($self, $callable)
             {
-                parent::__construct($source);
-
-                $this->callable = $callable;
+                $this->sourceStage   = $self->sourceStage;
+                $this->callable      = $callable;
+                $this->previousStage = $self;
             }
 
             protected function opWrapSink(Sink $sink) : Sink
             {
-                return new SortingSink($sink, $this->callable);
+                return new SortSink($sink, $this->callable);
             }
         };
     }
@@ -204,16 +208,16 @@ class ReferencePipeline extends BasePipeline
         {
             private $callable;
 
-            public function __construct($source, $callable)
+            public function __construct($self, $callable)
             {
-                parent::__construct($source);
-
-                $this->callable = $callable;
+                $this->sourceStage   = $self->sourceStage;
+                $this->callable      = $callable;
+                $this->previousStage = $self;
             }
 
             protected function opWrapSink(Sink $sink) : Sink
             {
-                return new InvokingSink($sink, $this->callable);
+                return new InvokeSink($sink, $this->callable);
             }
         };
     }
@@ -227,16 +231,16 @@ class ReferencePipeline extends BasePipeline
         {
             private $maxSize;
 
-            public function __construct($source, $maxSize)
+            public function __construct($self, $maxSize)
             {
-                parent::__construct($source);
-
-                $this->maxSize = $maxSize;
+                $this->sourceStage   = $self->sourceStage;
+                $this->maxSize       = $maxSize;
+                $this->previousStage = $self;
             }
 
             protected function opWrapSink(Sink $sink) : Sink
             {
-                return new SlicingSink($sink, null, $this->maxSize);
+                return new SliceSink($sink, null, $this->maxSize);
             }
         };
     }
@@ -250,16 +254,16 @@ class ReferencePipeline extends BasePipeline
         {
             private $skip;
 
-            public function __construct($source, $skip)
+            public function __construct($self, $skip)
             {
-                parent::__construct($source);
-
-                $this->skip = $skip;
+                $this->sourceStage   = $self->sourceStage;
+                $this->previousStage = $self;
+                $this->skip          = $skip;
             }
 
             protected function opWrapSink(Sink $sink) : Sink
             {
-                return new SlicingSink($sink, $this->skip, null);
+                return new SliceSink($sink, $this->skip, null);
             }
         };
     }
@@ -302,21 +306,10 @@ class ReferencePipeline extends BasePipeline
     public function min(callable $comparator = null)
     {
         if ($comparator === null) {
-            $comparator = function ($item, $current) {
-
-                if ($current === null){
-                    return $item;
-                }
-
-                if ($item < $current){
-                    return $item;
-                }
-
-                return $current;
-            };
+            $comparator = Collectors::defaultComparator();
         }
 
-        return $this->evaluate(new ReduceOp($comparator));
+        return $this->collect(Collectors::minBy($comparator));
     }
 
     /**
@@ -325,21 +318,10 @@ class ReferencePipeline extends BasePipeline
     public function max(callable $comparator = null)
     {
         if ($comparator === null) {
-            $comparator = function ($item, $current) {
-
-                if ($current === null){
-                    return $item;
-                }
-
-                if ($item > $current){
-                    return $item;
-                }
-
-                return $current;
-            };
+            $comparator = Collectors::defaultComparator();
         }
 
-        return $this->evaluate(new ReduceOp($comparator));
+        return $this->collect(Collectors::maxBy($comparator));
     }
 
     /**

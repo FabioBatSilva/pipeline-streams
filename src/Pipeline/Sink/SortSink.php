@@ -27,7 +27,7 @@ use Pipeline\Sink;
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-class SortingSink extends ChainedReference
+class SortSink extends ChainSink
 {
     /**
      * @var callable

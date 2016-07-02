@@ -21,7 +21,6 @@ declare(strict_types=1);
 namespace Pipeline;
 
 use Iterator;
-use Countable;
 use RuntimeException;
 
 use Pipeline\Sink;
@@ -31,19 +30,19 @@ use Pipeline\Sink;
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-abstract class BasePipeline implements Stream
+abstract class BaseStream implements Stream
 {
     /**
      * Backlink to the head of the pipeline chain (self if this is the source stage).
      *
-     * @var BasePipeline
+     * @var BaseStream
      */
     protected $sourceStage;
 
     /**
      * The "upstream" pipeline, or null if this is the source stage.
      *
-     * @var BasePipeline
+     * @var BaseStream
      */
     protected $previousStage;
 
@@ -64,29 +63,12 @@ abstract class BasePipeline implements Stream
     /**
      * Construct
      *
-     * @param \Iterator|\Pipeline\BasePipeline $consumer
+     * @param \Iterator $source
      */
-    public function __construct($source)
+    public function __construct(Iterator $source)
     {
-        if ( ! $source instanceof BasePipeline && ! $source instanceof Iterator) {
-            throw new \InvalidArgumentException(sprintf(
-                'Argument 1 passed to %s construct must be an instance of "%s" or "%s", "%s" given.',
-                get_class(),
-                Iterator::CLASS,
-                BasePipeline::CLASS,
-                is_object($source) ? get_class($source) : gettype($source)
-            ));
-        }
-
-        if ($source instanceof Iterator) {
-            $this->source      = $source;
-            $this->sourceStage = $this;
-        }
-
-        if ($source instanceof BasePipeline) {
-            $this->sourceStage   = $source->sourceStage;
-            $this->previousStage = $source;
-        }
+        $this->source      = $source;
+        $this->sourceStage = $this;
     }
 
     /**
