@@ -4,54 +4,48 @@ namespace PipelineTest;
 
 use ArrayObject;
 use ArrayIterator;
+use Pipeline\Pipelines;
 use Pipeline\Collector;
+use Pipeline\Collectors;
 use Pipeline\ReferencePipeline;
 
 class ReferencePipelineTest extends TestCase
 {
     public function testReducePipeline()
     {
-        $iterator = new ArrayIterator([2, 4, 8, 18, 32]);
-        $pipeline = new ReferencePipeline($iterator);
-        $result   = $pipeline
-            ->reduce(function(int $item, $state) {
-                return $state + $item;
-            }, 0);
+        $stream = Pipelines::of(2, 4, 8, 18, 32);
+        $result = $stream->reduce(function(int $item, $state) {
+            return $state + $item;
+        }, 0);
 
         $this->assertEquals(64, $result);
     }
 
     public function testToArray()
     {
-        $iterator = new ArrayIterator(range(1, 10));
-        $pipeline = new ReferencePipeline($iterator);
-        $result   = $pipeline
-            ->filter(function(int $e) {
-                return $e % 2 == 0;
-            })
-            ->toArray();
+        $stream = Pipelines::of(...range(1, 10));
+        $result = $stream->filter(function(int $e) {
+            return $e % 2 == 0;
+        })
+        ->toArray();
 
         $this->assertEquals([2, 4, 6, 8, 10], $result);
     }
 
     public function testFlatMap()
     {
-        $iterator = new ArrayIterator([[1,2,3], [4,5,6], [7,8,9]]);
-        $pipeline = new ReferencePipeline($iterator);
-        $result   = $pipeline
-            ->flatMap(function(array $e) {
-                return $e;
-            })
-            ->toArray();
+        $stream = Pipelines::of([1,2,3], [4,5,6], [7,8,9]);
+        $result = $stream->flatMap(function(array $e) {
+            return $e;
+        })->toArray();
 
         $this->assertEquals([1,2,3,4,5,6,7,8,9], $result);
     }
 
     public function testSorted()
     {
-        $iterator = new ArrayIterator([5, 4, 3, 2, 1]);
-        $pipeline = new ReferencePipeline($iterator);
-        $result   = $pipeline
+        $stream = Pipelines::of(5, 4, 3, 2, 1);
+        $result = $stream
             ->sorted()
             ->toArray();
 
@@ -60,22 +54,18 @@ class ReferencePipelineTest extends TestCase
 
     public function testSortedWithFunction()
     {
-        $iterator = new ArrayIterator(['lemons', 'apples', 'grapes']);
-        $pipeline = new ReferencePipeline($iterator);
-        $result   = $pipeline
-            ->sorted(function (string $a, string $b) {
-                return strcmp($a, $b);
-            })
-            ->toArray();
+        $stream = Pipelines::of('lemons', 'apples', 'grapes');
+        $result = $stream->sorted(function (string $a, string $b) {
+            return strcmp($a, $b);
+        })->toArray();
 
         $this->assertEquals(['apples', 'grapes', 'lemons'], $result);
     }
 
     public function testLimit()
     {
-        $iterator = new ArrayIterator(range(1, 10));
-        $pipeline = new ReferencePipeline($iterator);
-        $result   = $pipeline
+        $stream = Pipelines::of(...range(1, 10));
+        $result = $stream
             ->limit(5)
             ->toArray();
 
@@ -84,9 +74,8 @@ class ReferencePipelineTest extends TestCase
 
     public function testSkip()
     {
-        $iterator = new ArrayIterator(range(1, 10));
-        $pipeline = new ReferencePipeline($iterator);
-        $result   = $pipeline
+        $stream = Pipelines::of(...range(1, 10));
+        $result = $stream
             ->skip(5)
             ->toArray();
 
@@ -95,9 +84,8 @@ class ReferencePipelineTest extends TestCase
 
     public function testSlice()
     {
-        $iterator = new ArrayIterator(range(1, 10));
-        $pipeline = new ReferencePipeline($iterator);
-        $result   = $pipeline
+        $stream = Pipelines::of(...range(1, 10));
+        $result = $stream
             ->skip(4)
             ->limit(4)
             ->toArray();
@@ -107,45 +95,40 @@ class ReferencePipelineTest extends TestCase
 
     public function testMin()
     {
-        $iterator = new ArrayIterator([1, 5, 5, 3, 10]);
-        $pipeline = new ReferencePipeline($iterator);
-        $result   = $pipeline->min();
+        $stream = Pipelines::of(1, 5, 5, 3, 10);
+        $result = $stream->min();
 
         $this->assertEquals(1, $result);
     }
 
     public function testMax()
     {
-        $iterator = new ArrayIterator([1, 7, 5, 5, 2]);
-        $pipeline = new ReferencePipeline($iterator);
-        $result   = $pipeline->max();
+        $stream = Pipelines::of(1, 7, 5, 5, 2);
+        $result = $stream->max();
 
         $this->assertEquals(7, $result);
     }
 
     public function testCount()
     {
-        $iterator = new ArrayIterator(range(1, 10));
-        $pipeline = new ReferencePipeline($iterator);
-        $result   = $pipeline->count();
+        $stream = Pipelines::of(...range(1, 10));
+        $result = $stream->count();
 
         $this->assertEquals(10, $result);
     }
 
     public function testFindFirst()
     {
-        $iterator = new ArrayIterator([5, 4, 3, 2, 1]);
-        $pipeline = new ReferencePipeline($iterator);
-        $result   = $pipeline->findFirst();
+        $stream = Pipelines::of(5, 4, 3, 2, 1);
+        $result = $stream->findFirst();
 
         $this->assertEquals(5, $result);
     }
 
     public function testFindFirstMatch()
     {
-        $iterator = new ArrayIterator([5, 4, 3, 2, 1]);
-        $pipeline = new ReferencePipeline($iterator);
-        $result   = $pipeline->findFirst(function(int $e) {
+        $stream = Pipelines::of(5, 4, 3, 2, 1);
+        $result = $stream->findFirst(function(int $e) {
             return ($e < 5) && ($e % 2 != 0);
         });
 
@@ -154,54 +137,52 @@ class ReferencePipelineTest extends TestCase
 
     public function testAnyMatch()
     {
-        $iterator  = new ArrayIterator([5, 4, 3, 2, 1]);
-        $pipeline1 = new ReferencePipeline($iterator);
-        $pipeline2 = new ReferencePipeline($iterator);
+        $values  = [5, 4, 3, 2, 1];
+        $stream1 = Pipelines::of(...$values);
+        $stream2 = Pipelines::of(...$values);
 
-        $this->assertTrue($pipeline1->anyMatch(function(int $e) {
+        $this->assertTrue($stream1->anyMatch(function(int $e) {
             return $e === 3;
         }));
 
-        $this->assertFalse($pipeline2->anyMatch(function(int $e) {
+        $this->assertFalse($stream2->anyMatch(function(int $e) {
             return $e === 10;
         }));
     }
 
     public function testAllMatch()
     {
-        $iterator  = new ArrayIterator([5, 4, 3, 2, 1]);
-        $pipeline1 = new ReferencePipeline($iterator);
-        $pipeline2 = new ReferencePipeline($iterator);
+        $values  = [5, 4, 3, 2, 1];
+        $stream1 = Pipelines::of(...$values);
+        $stream2 = Pipelines::of(...$values);
 
-        $this->assertTrue($pipeline1->allMatch(function(int $e) {
+        $this->assertTrue($stream1->allMatch(function(int $e) {
             return $e < 10;
         }));
 
-        $this->assertFalse($pipeline2->allMatch(function(int $e) {
+        $this->assertFalse($stream2->allMatch(function(int $e) {
             return $e > 2;
         }));
     }
 
     public function testNoneMatch()
     {
-        $iterator  = new ArrayIterator([5, 4, 3, 2, 1]);
-        $pipeline1 = new ReferencePipeline($iterator);
-        $pipeline2 = new ReferencePipeline($iterator);
+        $values  = [5, 4, 3, 2, 1];
+        $stream1 = Pipelines::of(...$values);
+        $stream2 = Pipelines::of(...$values);
 
-        $this->assertTrue($pipeline1->noneMatch(function(int $e) {
+        $this->assertTrue($stream1->noneMatch(function(int $e) {
             return $e > 10;
         }));
 
-        $this->assertFalse($pipeline2->noneMatch(function(int $e) {
+        $this->assertFalse($stream2->noneMatch(function(int $e) {
             return $e < 5;
         }));
     }
 
     public function testCollect()
     {
-        $values    = ['one', 'two', 'three'];
-        $iterator  = new ArrayIterator($values);
-        $pipeline  = new ReferencePipeline($iterator);
+        $stream    = Pipelines::of('one', 'two', 'three');
         $collector = $this->createMock(Collector::CLASS);
 
         $collector
@@ -218,14 +199,47 @@ class ReferencePipelineTest extends TestCase
                 $this->equalTo('three')
             );
 
-        $this->assertEquals('foo-bar', $pipeline->collect($collector));
+        $this->assertEquals('foo-bar', $stream->collect($collector));
+    }
+
+    public function testCollectGroupBy()
+    {
+        $values = [
+            ['key' => 'one',   'value' => '1 - 1'],
+            ['key' => 'one',   'value' => '1 - 2'],
+            ['key' => 'one',   'value' => '1 - 3'],
+            ['key' => 'two',   'value' => '2 - 1'],
+            ['key' => 'two',   'value' => '2 - 2'],
+            ['key' => 'three', 'value' => '3 - 1']
+        ];
+
+        $stream = Pipelines::of(...$values);
+        $result = $stream->collect(Collectors::groupingBy(function (array $item){
+            return $item['key'];
+        }));
+
+        $this->assertArrayHasKey('one', $result);
+        $this->assertArrayHasKey('two', $result);
+        $this->assertArrayHasKey('three', $result);
+
+        $this->assertCount(3, $result['one']);
+        $this->assertCount(2, $result['two']);
+        $this->assertCount(1, $result['three']);
+
+        $this->assertEquals('1 - 1', $result['one'][0]['value']);
+        $this->assertEquals('1 - 2', $result['one'][1]['value']);
+        $this->assertEquals('1 - 3', $result['one'][2]['value']);
+
+        $this->assertEquals('2 - 1', $result['two'][0]['value']);
+        $this->assertEquals('2 - 2', $result['two'][1]['value']);
+
+        $this->assertEquals('3 - 1', $result['three'][0]['value']);
     }
 
     public function testMapToNumeric()
     {
-        $iterator = new ArrayIterator(['a', 'bb', 'ccc']);
-        $pipeline = new ReferencePipeline($iterator);
-        $result   = $pipeline->mapToNumeric(function(string $e) {
+        $stream = Pipelines::of('a', 'bb', 'ccc');
+        $result = $stream->mapToNumeric(function(string $e) {
             return strlen($e);
         })->sum();
 
@@ -234,9 +248,8 @@ class ReferencePipelineTest extends TestCase
 
     public function testFlatMapToNumeric()
     {
-        $iterator = new ArrayIterator([['a', 'bb'], ['ccc', 'dddd']]);
-        $pipeline = new ReferencePipeline($iterator);
-        $result   = $pipeline->flatMapToNumeric(function(array $e) {
+        $stream = Pipelines::of(['a', 'bb'], ['ccc', 'dddd']);
+        $result = $stream->flatMapToNumeric(function(array $e) {
             return array_map('strlen', $e);
         })->average();
 
@@ -245,21 +258,18 @@ class ReferencePipelineTest extends TestCase
 
     public function testDistinct()
     {
-        $values   = [1, 2, 2, 3, 4, 5, 5, 1];
-        $iterator = new ArrayIterator($values);
-        $pipeline = new ReferencePipeline($iterator);
-        $result   = $pipeline->distinct()->toArray();
+        $stream = Pipelines::of(1, 2, 2, 3, 4, 5, 5, 1);
+        $result = $stream->distinct()->toArray();
 
         $this->assertEquals([1, 2, 3, 4, 5], $result);
     }
 
     public function testForEach()
     {
-        $iterator = new ArrayIterator(array_reverse(range(0, 10)));
-        $pipeline = new ReferencePipeline($iterator);
-        $result   = new ArrayObject();
+        $stream = Pipelines::of(...array_reverse(range(0, 10)));
+        $result = new ArrayObject();
 
-        $pipeline
+        $stream
             ->sorted()
             ->filter(function(int $e) {
                 return $e % 2 == 0;

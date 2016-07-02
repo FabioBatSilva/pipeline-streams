@@ -198,18 +198,38 @@ final class Collectors
     }
 
     /**
-     * Returns a callable comparator.
+     * Returns a Collector implementing a "group by" operation on input elements,
+     * grouping elements according to a classification function, and returning the results in a array.
      *
-     * @return callable
+     * @param callable $comparator
+     *
+     * @return \Pipeline\Collector
      */
-    public static function defaultComparator() : callable
+    public static function groupingBy(callable $classifier)
     {
-        return function ($a, $b) {
-            if ($a === $b) {
-                return 0;
+        return new class($classifier) implements Collector
+        {
+            private $values = [];
+
+            private $classifier;
+
+            public function __construct($classifier)
+            {
+                $this->classifier = $classifier;
             }
 
-            return ($a < $b) ? -1 : 1;
+            public function accept($item)
+            {
+                $callable = $this->classifier;
+                $itemKey  = $callable($item);
+
+                $this->values[$itemKey][] = $item;
+            }
+
+            public function get()
+            {
+                return $this->values;
+            }
         };
     }
 }

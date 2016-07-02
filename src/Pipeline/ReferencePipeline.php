@@ -306,7 +306,7 @@ class ReferencePipeline extends BaseStream
     public function min(callable $comparator = null)
     {
         if ($comparator === null) {
-            $comparator = Collectors::defaultComparator();
+            $comparator = self::defaultComparator();
         }
 
         return $this->collect(Collectors::minBy($comparator));
@@ -318,7 +318,7 @@ class ReferencePipeline extends BaseStream
     public function max(callable $comparator = null)
     {
         if ($comparator === null) {
-            $comparator = Collectors::defaultComparator();
+            $comparator = self::defaultComparator();
         }
 
         return $this->collect(Collectors::maxBy($comparator));
@@ -367,5 +367,21 @@ class ReferencePipeline extends BaseStream
     public function findFirst(callable $predicate = null)
     {
         return $this->evaluate(new FindOp($predicate));
+    }
+
+    /**
+     * Returns a callable comparator.
+     *
+     * @return callable
+     */
+    private static function defaultComparator() : callable
+    {
+        return function ($a, $b) {
+            if ($a === $b) {
+                return 0;
+            }
+
+            return ($a < $b) ? -1 : 1;
+        };
     }
 }
