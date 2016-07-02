@@ -16,7 +16,6 @@ install:
     - composer install --prefer-dist
 
 script:
-    - ./vendor/bin/phpcs -p --extensions=php --standard=ruleset.xml src
     - ./vendor/bin/phpunit -v --coverage-clover ./build/logs/clover.xml
 
 after_script:

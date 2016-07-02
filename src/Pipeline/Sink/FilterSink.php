@@ -55,7 +55,7 @@ final class FilterSink extends ChainSink
         $result   = $callable($item);
 
         if ($result === true) {
-            $this->downstream->accept($item);;
+            $this->downstream->accept($item);
         }
     }
 }

@@ -285,7 +285,7 @@ class Pipeline extends BaseStream
      */
     public function forEach(callable $action)
     {
-        $this->evaluate(new ForEachOp($action, false));
+        $this->evaluate(new ForEachOp($action));
     }
 
     /**
