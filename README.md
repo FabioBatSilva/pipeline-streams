@@ -16,7 +16,7 @@ composer require pipeline-streams/pipeline-streams
 ```php
 <?php
 
-Pipelines::of(range(0, 10))
+Pipelines::of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
     ->filter(function(int $e) {
         return $e % 2 == 0;
     })
