@@ -20,42 +20,24 @@ declare(strict_types=1);
 
 namespace Pipeline;
 
-use ArrayObject;
-
-use Pipeline\Op\ForEachOp;
-use Pipeline\Op\CollectOp;
-use Pipeline\Op\ReduceOp;
-use Pipeline\Op\MatchOp;
-use Pipeline\Op\FindOp;
-
-use Pipeline\Sink\SortingSink;
-use Pipeline\Sink\MappingSink;
-use Pipeline\Sink\SlicingSink;
-use Pipeline\Sink\InvokingSink;
-use Pipeline\Sink\FilteringSink;
-use Pipeline\Sink\FlatMappingSink;
-use Pipeline\Sink\ChainedReference;
-
 /**
- * Default Numeric Pipeline
+ * A sequence of numeric elements supporting aggregate operations.
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-class DefaultNumericPipeline extends DefaultPipeline implements NumericPipeline
+interface NumericStream extends Stream
 {
     /**
-     * {@inheritdoc}
+     * Returns an number describing the arithmetic mean of elements of this stream.
+     *
+     * @return int|float
      */
-    public function average()
-    {
-        return $this->collect(Collectors::averagingNumbers());
-    }
+    public function average();
 
     /**
-     * {@inheritdoc}
+     * Returns the sum of elements in this stream.
+     *
+     * @return int|float
      */
-    public function sum()
-    {
-        return $this->collect(Collectors::summingNumbers());
-    }
+    public function sum();
 }

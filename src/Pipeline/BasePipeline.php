@@ -27,23 +27,23 @@ use RuntimeException;
 use Pipeline\Sink;
 
 /**
- * Reference Pipeline
+ * Base Stream Pipeline implementation
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-abstract class BasePipeline implements Pipeline
+abstract class BasePipeline implements Stream
 {
     /**
      * Backlink to the head of the pipeline chain (self if this is the source stage).
      *
-     * @var AbstractPipeline
+     * @var BasePipeline
      */
     protected $sourceStage;
 
     /**
      * The "upstream" pipeline, or null if this is the source stage.
      *
-     * @var AbstractPipeline
+     * @var BasePipeline
      */
     protected $previousStage;
 
@@ -64,7 +64,7 @@ abstract class BasePipeline implements Pipeline
     /**
      * Construct
      *
-     * @param Iterator|BasePipeline $consumer
+     * @param \Iterator|\Pipeline\BasePipeline $consumer
      */
     public function __construct($source)
     {
@@ -78,14 +78,14 @@ abstract class BasePipeline implements Pipeline
             ));
         }
 
-        if ($source instanceof BasePipeline) {
-            $this->sourceStage   = $source->sourceStage;
-            $this->previousStage = $source;
-        }
-
         if ($source instanceof Iterator) {
             $this->source      = $source;
             $this->sourceStage = $this;
+        }
+
+        if ($source instanceof BasePipeline) {
+            $this->sourceStage   = $source->sourceStage;
+            $this->previousStage = $source;
         }
     }
 
@@ -167,7 +167,7 @@ abstract class BasePipeline implements Pipeline
      *
      * @return \Iterator
      */
-    public function sourceIterator() : Iterator
+    protected function sourceIterator() : Iterator
     {
         if ($this->sourceStage->consumed) {
             throw new RuntimeException('Source already consumed or closed');

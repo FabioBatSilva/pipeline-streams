@@ -22,14 +22,12 @@ namespace Pipeline\Op;
 
 use Iterator;
 
-use Pipeline\BaseTerminalSink;
-
 /**
  * An operation in a stream pipeline that implement reductions.
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-class ReduceOp extends BaseTerminalSink
+class ReduceOp extends BaseTerminalOp
 {
     /**
      * @var mixed

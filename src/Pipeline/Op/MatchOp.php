@@ -22,8 +22,6 @@ namespace Pipeline\Op;
 
 use Iterator;
 
-use Pipeline\BaseTerminalSink;
-
 /**
  * An operation that evaluates a predicate on the
  * elements of a stream and determines whether all, any or none of those
@@ -31,7 +29,7 @@ use Pipeline\BaseTerminalSink;
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-class MatchOp extends BaseTerminalSink
+class MatchOp extends BaseTerminalOp
 {
     /**
      * Do all elements match the predicate?

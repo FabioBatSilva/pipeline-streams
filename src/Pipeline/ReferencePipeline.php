@@ -37,18 +37,18 @@ use Pipeline\Sink\FlatMappingSink;
 use Pipeline\Sink\DistinguishSink;
 
 /**
- * Default Pipeline
+ * Implements a pipeline stage or pipeline source stage implementing whose elements are of any type.
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-class DefaultPipeline extends BasePipeline
+class ReferencePipeline extends BasePipeline
 {
     /**
      * {@inheritdoc}
      */
-    public function filter(callable $predicate) : Pipeline
+    public function filter(callable $predicate) : Stream
     {
-        return new class($this, $predicate) extends DefaultPipeline
+        return new class($this, $predicate) extends ReferencePipeline
         {
             private $callable;
 
@@ -69,9 +69,9 @@ class DefaultPipeline extends BasePipeline
     /**
      * {@inheritdoc}
      */
-    public function map(callable $mapper) : Pipeline
+    public function map(callable $mapper) : Stream
     {
-        return new class($this, $mapper) extends DefaultPipeline
+        return new class($this, $mapper) extends ReferencePipeline
         {
             private $callable;
 
@@ -92,9 +92,9 @@ class DefaultPipeline extends BasePipeline
     /**
      * {@inheritdoc}
      */
-    public function mapToNumeric(callable $mapper) : NumericPipeline
+    public function mapToNumeric(callable $mapper) : NumericStream
     {
-        return new class($this, $mapper) extends DefaultNumericPipeline
+        return new class($this, $mapper) extends NumericPipeline
         {
             private $callable;
 
@@ -115,9 +115,9 @@ class DefaultPipeline extends BasePipeline
     /**
      * {@inheritdoc}
      */
-    public function flatMap(callable $mapper) : Pipeline
+    public function flatMap(callable $mapper) : Stream
     {
-        return new class($this, $mapper) extends DefaultPipeline
+        return new class($this, $mapper) extends ReferencePipeline
         {
             private $callable;
 
@@ -138,9 +138,9 @@ class DefaultPipeline extends BasePipeline
     /**
      * {@inheritdoc}
      */
-    public function flatMapToNumeric(callable $mapper) : NumericPipeline
+    public function flatMapToNumeric(callable $mapper) : NumericStream
     {
-        return new class($this, $mapper) extends DefaultNumericPipeline
+        return new class($this, $mapper) extends NumericPipeline
         {
             private $callable;
 
@@ -161,9 +161,9 @@ class DefaultPipeline extends BasePipeline
     /**
      * {@inheritdoc}
      */
-    public function distinct() : Pipeline
+    public function distinct() : Stream
     {
-        return new class($this) extends DefaultPipeline
+        return new class($this) extends ReferencePipeline
         {
             protected function opWrapSink(Sink $sink) : Sink
             {
@@ -175,9 +175,9 @@ class DefaultPipeline extends BasePipeline
     /**
      * {@inheritdoc}
      */
-    public function sorted(callable $comparator = null) : Pipeline
+    public function sorted(callable $comparator = null) : Stream
     {
-        return new class($this, $comparator) extends DefaultPipeline
+        return new class($this, $comparator) extends ReferencePipeline
         {
             private $callable;
 
@@ -198,9 +198,9 @@ class DefaultPipeline extends BasePipeline
     /**
      * {@inheritdoc}
      */
-    public function peek(callable $action) : Pipeline
+    public function peek(callable $action) : Stream
     {
-        return new class($this, $action) extends DefaultPipeline
+        return new class($this, $action) extends ReferencePipeline
         {
             private $callable;
 
@@ -221,9 +221,9 @@ class DefaultPipeline extends BasePipeline
     /**
      * {@inheritdoc}
      */
-    public function limit(int $maxSize) : Pipeline
+    public function limit(int $maxSize) : Stream
     {
-        return new class($this, $maxSize) extends DefaultPipeline
+        return new class($this, $maxSize) extends ReferencePipeline
         {
             private $maxSize;
 
@@ -244,9 +244,9 @@ class DefaultPipeline extends BasePipeline
     /**
      * {@inheritdoc}
      */
-    public function skip(int $skip) : Pipeline
+    public function skip(int $skip) : Stream
     {
-        return new class($this, $skip) extends DefaultPipeline
+        return new class($this, $skip) extends ReferencePipeline
         {
             private $skip;
 

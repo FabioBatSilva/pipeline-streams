@@ -5,14 +5,14 @@ namespace PipelineTest;
 use ArrayObject;
 use ArrayIterator;
 use Pipeline\Collector;
-use Pipeline\DefaultPipeline;
+use Pipeline\ReferencePipeline;
 
-class DefaultPipelineTest extends TestCase
+class ReferencePipelineTest extends TestCase
 {
     public function testReducePipeline()
     {
         $iterator = new ArrayIterator([2, 4, 8, 18, 32]);
-        $pipeline = new DefaultPipeline($iterator);
+        $pipeline = new ReferencePipeline($iterator);
         $result   = $pipeline
             ->reduce(function(int $item, $state) {
                 return $state + $item;
@@ -24,7 +24,7 @@ class DefaultPipelineTest extends TestCase
     public function testToArray()
     {
         $iterator = new ArrayIterator(range(1, 10));
-        $pipeline = new DefaultPipeline($iterator);
+        $pipeline = new ReferencePipeline($iterator);
         $result   = $pipeline
             ->filter(function(int $e) {
                 return $e % 2 == 0;
@@ -37,7 +37,7 @@ class DefaultPipelineTest extends TestCase
     public function testFlatMap()
     {
         $iterator = new ArrayIterator([[1,2,3], [4,5,6], [7,8,9]]);
-        $pipeline = new DefaultPipeline($iterator);
+        $pipeline = new ReferencePipeline($iterator);
         $result   = $pipeline
             ->flatMap(function(array $e) {
                 return $e;
@@ -50,7 +50,7 @@ class DefaultPipelineTest extends TestCase
     public function testSorted()
     {
         $iterator = new ArrayIterator([5, 4, 3, 2, 1]);
-        $pipeline = new DefaultPipeline($iterator);
+        $pipeline = new ReferencePipeline($iterator);
         $result   = $pipeline
             ->sorted()
             ->toArray();
@@ -61,7 +61,7 @@ class DefaultPipelineTest extends TestCase
     public function testSortedWithFunction()
     {
         $iterator = new ArrayIterator(['lemons', 'apples', 'grapes']);
-        $pipeline = new DefaultPipeline($iterator);
+        $pipeline = new ReferencePipeline($iterator);
         $result   = $pipeline
             ->sorted(function (string $a, string $b) {
                 return strcmp($a, $b);
@@ -74,7 +74,7 @@ class DefaultPipelineTest extends TestCase
     public function testLimit()
     {
         $iterator = new ArrayIterator(range(1, 10));
-        $pipeline = new DefaultPipeline($iterator);
+        $pipeline = new ReferencePipeline($iterator);
         $result   = $pipeline
             ->limit(5)
             ->toArray();
@@ -85,7 +85,7 @@ class DefaultPipelineTest extends TestCase
     public function testSkip()
     {
         $iterator = new ArrayIterator(range(1, 10));
-        $pipeline = new DefaultPipeline($iterator);
+        $pipeline = new ReferencePipeline($iterator);
         $result   = $pipeline
             ->skip(5)
             ->toArray();
@@ -96,7 +96,7 @@ class DefaultPipelineTest extends TestCase
     public function testSlice()
     {
         $iterator = new ArrayIterator(range(1, 10));
-        $pipeline = new DefaultPipeline($iterator);
+        $pipeline = new ReferencePipeline($iterator);
         $result   = $pipeline
             ->skip(4)
             ->limit(4)
@@ -108,7 +108,7 @@ class DefaultPipelineTest extends TestCase
     public function testMin()
     {
         $iterator = new ArrayIterator([1, 5, 5, 3, 10]);
-        $pipeline = new DefaultPipeline($iterator);
+        $pipeline = new ReferencePipeline($iterator);
         $result   = $pipeline->min();
 
         $this->assertEquals(1, $result);
@@ -117,7 +117,7 @@ class DefaultPipelineTest extends TestCase
     public function testMax()
     {
         $iterator = new ArrayIterator([1, 7, 5, 5, 2]);
-        $pipeline = new DefaultPipeline($iterator);
+        $pipeline = new ReferencePipeline($iterator);
         $result   = $pipeline->max();
 
         $this->assertEquals(7, $result);
@@ -126,7 +126,7 @@ class DefaultPipelineTest extends TestCase
     public function testCount()
     {
         $iterator = new ArrayIterator(range(1, 10));
-        $pipeline = new DefaultPipeline($iterator);
+        $pipeline = new ReferencePipeline($iterator);
         $result   = $pipeline->count();
 
         $this->assertEquals(10, $result);
@@ -135,7 +135,7 @@ class DefaultPipelineTest extends TestCase
     public function testFindFirst()
     {
         $iterator = new ArrayIterator([5, 4, 3, 2, 1]);
-        $pipeline = new DefaultPipeline($iterator);
+        $pipeline = new ReferencePipeline($iterator);
         $result   = $pipeline->findFirst();
 
         $this->assertEquals(5, $result);
@@ -144,7 +144,7 @@ class DefaultPipelineTest extends TestCase
     public function testFindFirstMatch()
     {
         $iterator = new ArrayIterator([5, 4, 3, 2, 1]);
-        $pipeline = new DefaultPipeline($iterator);
+        $pipeline = new ReferencePipeline($iterator);
         $result   = $pipeline->findFirst(function(int $e) {
             return ($e < 5) && ($e % 2 != 0);
         });
@@ -155,8 +155,8 @@ class DefaultPipelineTest extends TestCase
     public function testAnyMatch()
     {
         $iterator  = new ArrayIterator([5, 4, 3, 2, 1]);
-        $pipeline1 = new DefaultPipeline($iterator);
-        $pipeline2 = new DefaultPipeline($iterator);
+        $pipeline1 = new ReferencePipeline($iterator);
+        $pipeline2 = new ReferencePipeline($iterator);
 
         $this->assertTrue($pipeline1->anyMatch(function(int $e) {
             return $e === 3;
@@ -170,8 +170,8 @@ class DefaultPipelineTest extends TestCase
     public function testAllMatch()
     {
         $iterator  = new ArrayIterator([5, 4, 3, 2, 1]);
-        $pipeline1 = new DefaultPipeline($iterator);
-        $pipeline2 = new DefaultPipeline($iterator);
+        $pipeline1 = new ReferencePipeline($iterator);
+        $pipeline2 = new ReferencePipeline($iterator);
 
         $this->assertTrue($pipeline1->allMatch(function(int $e) {
             return $e < 10;
@@ -185,8 +185,8 @@ class DefaultPipelineTest extends TestCase
     public function testNoneMatch()
     {
         $iterator  = new ArrayIterator([5, 4, 3, 2, 1]);
-        $pipeline1 = new DefaultPipeline($iterator);
-        $pipeline2 = new DefaultPipeline($iterator);
+        $pipeline1 = new ReferencePipeline($iterator);
+        $pipeline2 = new ReferencePipeline($iterator);
 
         $this->assertTrue($pipeline1->noneMatch(function(int $e) {
             return $e > 10;
@@ -201,7 +201,7 @@ class DefaultPipelineTest extends TestCase
     {
         $values    = ['one', 'two', 'three'];
         $iterator  = new ArrayIterator($values);
-        $pipeline  = new DefaultPipeline($iterator);
+        $pipeline  = new ReferencePipeline($iterator);
         $collector = $this->createMock(Collector::CLASS);
 
         $collector
@@ -224,7 +224,7 @@ class DefaultPipelineTest extends TestCase
     public function testMapToNumeric()
     {
         $iterator = new ArrayIterator(['a', 'bb', 'ccc']);
-        $pipeline = new DefaultPipeline($iterator);
+        $pipeline = new ReferencePipeline($iterator);
         $result   = $pipeline->mapToNumeric(function(string $e) {
             return strlen($e);
         })->sum();
@@ -235,7 +235,7 @@ class DefaultPipelineTest extends TestCase
     public function testFlatMapToNumeric()
     {
         $iterator = new ArrayIterator([['a', 'bb'], ['ccc', 'dddd']]);
-        $pipeline = new DefaultPipeline($iterator);
+        $pipeline = new ReferencePipeline($iterator);
         $result   = $pipeline->flatMapToNumeric(function(array $e) {
             return array_map('strlen', $e);
         })->average();
@@ -247,7 +247,7 @@ class DefaultPipelineTest extends TestCase
     {
         $values   = [1, 2, 2, 3, 4, 5, 5, 1];
         $iterator = new ArrayIterator($values);
-        $pipeline = new DefaultPipeline($iterator);
+        $pipeline = new ReferencePipeline($iterator);
         $result   = $pipeline->distinct()->toArray();
 
         $this->assertEquals([1, 2, 3, 4, 5], $result);
@@ -256,7 +256,7 @@ class DefaultPipelineTest extends TestCase
     public function testForEach()
     {
         $iterator = new ArrayIterator(array_reverse(range(0, 10)));
-        $pipeline = new DefaultPipeline($iterator);
+        $pipeline = new ReferencePipeline($iterator);
         $result   = new ArrayObject();
 
         $pipeline
@@ -285,7 +285,7 @@ class DefaultPipelineTest extends TestCase
      */
     public function testConstructArrayException()
     {
-        new DefaultPipeline([]);
+        new ReferencePipeline([]);
     }
 
     /**
@@ -294,6 +294,6 @@ class DefaultPipelineTest extends TestCase
      */
     public function testConstructStdClassException()
     {
-        new DefaultPipeline(new \stdClass);
+        new ReferencePipeline(new \stdClass);
     }
 }

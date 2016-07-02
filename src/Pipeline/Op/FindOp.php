@@ -22,15 +22,12 @@ namespace Pipeline\Op;
 
 use Iterator;
 
-use Pipeline\TerminalSink;
-use Pipeline\BaseTerminalSink;
-
 /**
  * An operation that searches for an element in a stream pipeline, and terminates when it finds one.
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-class FindOp extends BaseTerminalSink
+class FindOp extends BaseTerminalOp
 {
     /**
      * @var bool

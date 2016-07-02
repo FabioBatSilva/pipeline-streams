@@ -22,15 +22,12 @@ namespace Pipeline\Op;
 
 use Iterator;
 
-use Pipeline\PipelineOpFlag;
-use Pipeline\BaseTerminalSink;
-
 /**
  * An operation in a stream pipeline that takes a stream as input and produces a result or side-effect.
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-class ForEachOp extends BaseTerminalSink
+class ForEachOp extends BaseTerminalOp
 {
     /**
      * @var callable

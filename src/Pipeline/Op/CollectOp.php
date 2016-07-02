@@ -23,14 +23,13 @@ namespace Pipeline\Op;
 use Iterator;
 
 use Pipeline\Collector;
-use Pipeline\BaseTerminalSink;
 
 /**
  * An operation in a stream pipeline that collect values.
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-class CollectOp extends BaseTerminalSink
+class CollectOp extends BaseTerminalOp
 {
     /**
      * @var \Pipeline\Collector

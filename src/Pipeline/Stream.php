@@ -25,16 +25,16 @@ namespace Pipeline;
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-interface Pipeline
+interface Stream
 {
     /**
      * Returns a stream consisting of the elements of this stream that match the given predicate.
      *
      * @param callable $predicate Predicate to apply to each element to determine if it should be included
      *
-     * @return \Pipeline\Pipeline
+     * @return \Pipeline\Stream
      */
-    public function filter(callable $predicate) : Pipeline;
+    public function filter(callable $predicate) : Stream;
 
     /**
      * Returns a stream consisting of the results of applying the
@@ -42,19 +42,19 @@ interface Pipeline
      *
      * @param callable $mapper callable to apply to each element
      *
-     * @return \Pipeline\Pipeline
+     * @return \Pipeline\Stream
      */
-    public function map(callable $mapper) : Pipeline;
+    public function map(callable $mapper) : Stream;
 
     /**
-     * Returns an IntPipeline consisting of the results of applying the
+     * Returns an NumericStream consisting of the results of applying the
      * given function to the elements of this stream.
      *
      * @param callable $mapper callable to apply to each element
      *
-     * @return \Pipeline\NumericPipeline
+     * @return \Pipeline\NumericStream
      */
-    public function mapToNumeric(callable $mapper) : NumericPipeline;
+    public function mapToNumeric(callable $mapper) : NumericStream;
 
     /**
      * Returns a stream consisting of the results of replacing each element of
@@ -63,27 +63,27 @@ interface Pipeline
      *
      * @param callable $mapper A function to apply to each element which produces a stream of new values
      *
-     * @return \Pipeline\Pipeline
+     * @return \Pipeline\Stream
      */
-    public function flatMap(callable $mapper) : Pipeline;
+    public function flatMap(callable $mapper) : Stream;
 
     /**
-     * Returns an IntPipeline consisting of the results of replacing each
+     * Returns an NumericStream consisting of the results of replacing each
      * element of this stream with the contents of a mapped stream produced by
      * applying the provided mapping function to each element.
      *
      * @param callable $mapper A function to apply to each element which produces a stream of new values
      *
-     * @return \Pipeline\NumericPipeline
+     * @return \Pipeline\NumericStream
      */
-    public function flatMapToNumeric(callable $mapper) : NumericPipeline;
+    public function flatMapToNumeric(callable $mapper) : NumericStream;
 
     /**
      * Returns a stream consisting of the distinct elements.
      *
-     * @return \Pipeline\Pipeline
+     * @return \Pipeline\Stream
      */
-    public function distinct() : Pipeline;
+    public function distinct() : Stream;
 
     /**
      * Returns a stream consisting of the elements of this stream,
@@ -91,9 +91,9 @@ interface Pipeline
      *
      * @param callable $comparator Used to compare stream elements
      *
-     * @return \Pipeline\Pipeline
+     * @return \Pipeline\Stream
      */
-    public function sorted(callable $comparator = null) : Pipeline;
+    public function sorted(callable $comparator = null) : Stream;
 
     /**
      * Returns a stream consisting of the elements of this stream, additionally
@@ -102,7 +102,7 @@ interface Pipeline
      *
      * <code>
      * <?php
-     *     Pipelines::of("one", "two", "three", "four")
+     *     Streams::of("one", "two", "three", "four")
      *         ->filter(function ($e) { strlen($e) > 3})
      *         ->peek(function ($e) { echo "Filtered value: $e"})
      *         ->map('strtoupper')
@@ -112,9 +112,9 @@ interface Pipeline
      *
      * @param callable $action Action to perform on the elements as they are consumed from the stream
      *
-     * @return \Pipeline\Pipeline
+     * @return \Pipeline\Stream
      */
-    public function peek(callable $action) : Pipeline;
+    public function peek(callable $action) : Stream;
 
     /**
      * Returns a stream consisting of the elements of this stream, truncated
@@ -122,9 +122,9 @@ interface Pipeline
      *
      * @param integer $maxSize The max number of elements the stream should be limited to
      *
-     * @return \Pipeline\Pipeline
+     * @return \Pipeline\Stream
      */
-    public function limit(int $maxSize) : Pipeline;
+    public function limit(int $maxSize) : Stream;
 
     /**
      * Returns a stream consisting of the remaining elements of this stream
@@ -134,16 +134,16 @@ interface Pipeline
      *
      * @param integer $n The number of leading elements to skip
      *
-     * @return \Pipeline\Pipeline
+     * @return \Pipeline\Stream
      */
-    public function skip(int $n) : Pipeline;
+    public function skip(int $n) : Stream;
 
     /**
      * Performs an action for each element of this stream.
      *
      * <code>
      * <?php
-     *  Pipelines::of("one", "two", "three", "four")
+     *  Streams::of("one", "two", "three", "four")
      *      ->forEach(function (string $e) {
      *          file_put_contents('file.log', $e, FILE_APPEND | LOCK_EX);
      *      });
@@ -167,7 +167,7 @@ interface Pipeline
      *
      * <code>
      * <?php
-     *  $sum = Pipelines::of(range(0, 100))
+     *  $sum = Streams::of(range(0, 100))
      *      ->reduce(function (int $identity, int $item) {
      *          return $identity + $item;
      *      }, 0);

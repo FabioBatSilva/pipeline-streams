@@ -18,15 +18,28 @@
 
 declare(strict_types=1);
 
-namespace Pipeline;
+namespace Pipeline\Op;
+
+use Iterator;
+use Pipeline\TerminalOp;
+use Pipeline\TerminalSink;
+use Pipeline\BasePipeline;
 
 /**
- * Base Sink implementation
+ * Base TerminalOp implementation
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-abstract class BaseSink implements Sink
+abstract class BaseTerminalOp implements TerminalOp, TerminalSink
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function evaluate(BasePipeline $pipeline, Iterator $iterator)
+    {
+        return $pipeline->wrapAndCopyInto($this, $iterator)->get();
+    }
+
     /**
      * {@inheritdoc}
      */
