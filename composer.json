@@ -14,7 +14,8 @@
     },
     "require-dev": {
         "phpunit/phpunit":        "5.*",
-        "satooshi/php-coveralls": "~1.0"
+        "satooshi/php-coveralls": "~1.0",
+        "athletic/athletic":      "~0.1"
     },
     "autoload": {
         "psr-4": {
@@ -23,7 +24,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "PipelineTest\\": "test/PipelineTest"
+            "PipelineTest\\": "test/PipelineTest",
+            "PipelineBenchmark\\": "test/PipelineBenchmark"
         }
     }
 }

@@ -130,12 +130,7 @@ abstract class BaseStream implements Stream
      */
     public function count() : int
     {
-        $count    = 0;
-        $callable = function ($_, int $state) {
-            return ++ $state;
-        };
-
-        return $this->evaluate(new ReduceOp($callable, $count));
+        return $this->collect(Collectors::counting());
     }
 
     /**

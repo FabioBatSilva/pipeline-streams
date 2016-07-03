@@ -21,6 +21,7 @@ declare(strict_types=1);
 namespace Pipeline;
 
 use Pipeline\Collector\SumCollector;
+use Pipeline\Collector\CountCollector;
 use Pipeline\Collector\ArrayCollector;
 use Pipeline\Collector\MinMaxCollector;
 use Pipeline\Collector\AverageCollector;
@@ -46,6 +47,16 @@ final class Collectors
     public static function asArray()
     {
         return new ArrayCollector();
+    }
+
+    /**
+     * Returns a Collector that count the input elements
+     *
+     * @return \Pipeline\Collector
+     */
+    public static function counting()
+    {
+        return new CountCollector();
     }
 
     /**
