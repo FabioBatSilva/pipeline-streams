@@ -22,12 +22,6 @@ namespace Pipeline;
 
 use Iterator;
 
-use Pipeline\Op\FindOp;
-use Pipeline\Op\MatchOp;
-use Pipeline\Op\ReduceOp;
-use Pipeline\Op\CollectOp;
-use Pipeline\Op\ForEachOp;
-
 use Pipeline\Sink\MapSink;
 use Pipeline\Sink\SortSink;
 use Pipeline\Sink\SliceSink;
@@ -41,7 +35,7 @@ use Pipeline\Sink\DistinctSink;
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-class Pipeline extends BaseStream
+class Pipeline extends BaseStream implements MixedStream
 {
     /**
      * Create a source stage of a Pipeline.
@@ -58,22 +52,9 @@ class Pipeline extends BaseStream
      */
     public function filter(callable $predicate) : Stream
     {
-        return new class($this, $predicate) extends Pipeline
-        {
-            private $callable;
-
-            protected function __construct($self, $callable)
-            {
-                $this->sourceStage   = $self->sourceStage;
-                $this->callable      = $callable;
-                $this->previousStage = $self;
-            }
-
-            protected function opWrapSink(Sink $sink) : Sink
-            {
-                return new FilterSink($sink, $this->callable);
-            }
-        };
+        return $this->createMixedStream($this, function(Sink $sink) use ($predicate) {
+            return new FilterSink($sink, $predicate);
+        });
     }
 
     /**
@@ -81,22 +62,9 @@ class Pipeline extends BaseStream
      */
     public function map(callable $mapper) : Stream
     {
-        return new class($this, $mapper) extends Pipeline
-        {
-            private $callable;
-
-            protected function __construct($self, $callable)
-            {
-                $this->sourceStage   = $self->sourceStage;
-                $this->callable      = $callable;
-                $this->previousStage = $self;
-            }
-
-            protected function opWrapSink(Sink $sink) : Sink
-            {
-                return new MapSink($sink, $this->callable);
-            }
-        };
+        return $this->createMixedStream($this, function(Sink $sink) use ($mapper) {
+            return new MapSink($sink, $mapper);
+        });
     }
 
     /**
@@ -104,22 +72,9 @@ class Pipeline extends BaseStream
      */
     public function mapToNumeric(callable $mapper) : NumericStream
     {
-        return new class($this, $mapper) extends NumericPipeline
-        {
-            private $callable;
-
-            protected function __construct($self, $callable)
-            {
-                $this->sourceStage   = $self->sourceStage;
-                $this->callable      = $callable;
-                $this->previousStage = $self;
-            }
-
-            protected function opWrapSink(Sink $sink) : Sink
-            {
-                return new MapSink($sink, $this->callable);
-            }
-        };
+        return $this->createNumericStream($this, function(Sink $sink) use ($mapper) {
+            return new MapSink($sink, $mapper);
+        });
     }
 
     /**
@@ -127,22 +82,9 @@ class Pipeline extends BaseStream
      */
     public function flatMap(callable $mapper) : Stream
     {
-        return new class($this, $mapper) extends Pipeline
-        {
-            private $callable;
-
-            protected function __construct($self, $callable)
-            {
-                $this->sourceStage   = $self->sourceStage;
-                $this->callable      = $callable;
-                $this->previousStage = $self;
-            }
-
-            protected function opWrapSink(Sink $sink) : Sink
-            {
-                return new FlatMapSink($sink, $this->callable);
-            }
-        };
+        return $this->createMixedStream($this, function(Sink $sink) use ($mapper) {
+            return new FlatMapSink($sink, $mapper);
+        });
     }
 
     /**
@@ -150,22 +92,9 @@ class Pipeline extends BaseStream
      */
     public function flatMapToNumeric(callable $mapper) : NumericStream
     {
-        return new class($this, $mapper) extends NumericPipeline
-        {
-            private $callable;
-
-            protected function __construct($self, $callable)
-            {
-                $this->sourceStage   = $self->sourceStage;
-                $this->callable      = $callable;
-                $this->previousStage = $self;
-            }
-
-            protected function opWrapSink(Sink $sink) : Sink
-            {
-                return new FlatMapSink($sink, $this->callable);
-            }
-        };
+        return $this->createNumericStream($this, function(Sink $sink) use ($mapper) {
+            return new FlatMapSink($sink, $mapper);
+        });
     }
 
     /**
@@ -173,19 +102,9 @@ class Pipeline extends BaseStream
      */
     public function distinct() : Stream
     {
-        return new class($this) extends Pipeline
-        {
-            protected function __construct($self)
-            {
-                $this->sourceStage   = $self->sourceStage;
-                $this->previousStage = $self;
-            }
-
-            protected function opWrapSink(Sink $sink) : Sink
-            {
-                return new DistinctSink($sink);
-            }
-        };
+        return $this->createMixedStream($this, function(Sink $sink) {
+            return new DistinctSink($sink);
+        });
     }
 
     /**
@@ -193,22 +112,9 @@ class Pipeline extends BaseStream
      */
     public function sorted(callable $comparator = null) : Stream
     {
-        return new class($this, $comparator) extends Pipeline
-        {
-            private $callable;
-
-            protected function __construct($self, $callable)
-            {
-                $this->sourceStage   = $self->sourceStage;
-                $this->callable      = $callable;
-                $this->previousStage = $self;
-            }
-
-            protected function opWrapSink(Sink $sink) : Sink
-            {
-                return new SortSink($sink, $this->callable);
-            }
-        };
+        return $this->createMixedStream($this, function(Sink $sink) use ($comparator) {
+            return new SortSink($sink, $comparator);
+        });
     }
 
     /**
@@ -216,22 +122,9 @@ class Pipeline extends BaseStream
      */
     public function peek(callable $action) : Stream
     {
-        return new class($this, $action) extends Pipeline
-        {
-            private $callable;
-
-            protected function __construct($self, $callable)
-            {
-                $this->sourceStage   = $self->sourceStage;
-                $this->callable      = $callable;
-                $this->previousStage = $self;
-            }
-
-            protected function opWrapSink(Sink $sink) : Sink
-            {
-                return new InvokeSink($sink, $this->callable);
-            }
-        };
+        return $this->createMixedStream($this, function(Sink $sink) use ($action) {
+            return new InvokeSink($sink, $action);
+        });
     }
 
     /**
@@ -239,22 +132,9 @@ class Pipeline extends BaseStream
      */
     public function limit(int $maxSize) : Stream
     {
-        return new class($this, $maxSize) extends Pipeline
-        {
-            private $maxSize;
-
-            protected function __construct($self, $maxSize)
-            {
-                $this->sourceStage   = $self->sourceStage;
-                $this->maxSize       = $maxSize;
-                $this->previousStage = $self;
-            }
-
-            protected function opWrapSink(Sink $sink) : Sink
-            {
-                return new SliceSink($sink, null, $this->maxSize);
-            }
-        };
+        return $this->createMixedStream($this, function(Sink $sink) use ($maxSize) {
+            return new SliceSink($sink, null, $maxSize);
+        });
     }
 
     /**
@@ -262,138 +142,8 @@ class Pipeline extends BaseStream
      */
     public function skip(int $skip) : Stream
     {
-        return new class($this, $skip) extends Pipeline
-        {
-            private $skip;
-
-            protected function __construct($self, $skip)
-            {
-                $this->sourceStage   = $self->sourceStage;
-                $this->previousStage = $self;
-                $this->skip          = $skip;
-            }
-
-            protected function opWrapSink(Sink $sink) : Sink
-            {
-                return new SliceSink($sink, $this->skip, null);
-            }
-        };
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function forEach(callable $action)
-    {
-        $this->evaluate(new ForEachOp($action));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function toArray() : array
-    {
-        return $this->collect(Collectors::asArray());
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function reduce(callable $accumulator, $identity = null)
-    {
-        return $this->evaluate(new ReduceOp($accumulator, $identity));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function collect(Collector $collector)
-    {
-        return $this->evaluate(new CollectOp($collector));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function min(callable $comparator = null)
-    {
-        if ($comparator === null) {
-            $comparator = self::defaultComparator();
-        }
-
-        return $this->collect(Collectors::minBy($comparator));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function max(callable $comparator = null)
-    {
-        if ($comparator === null) {
-            $comparator = self::defaultComparator();
-        }
-
-        return $this->collect(Collectors::maxBy($comparator));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function count() : int
-    {
-        $count    = 0;
-        $callable = function ($_, int $state) {
-            return ++ $state;
-        };
-
-        return $this->evaluate(new ReduceOp($callable, $count));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function anyMatch(callable $predicate) : bool
-    {
-        return $this->evaluate(new MatchOp($predicate, MatchOp::ANY));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function allMatch(callable $predicate) : bool
-    {
-        return $this->evaluate(new MatchOp($predicate, MatchOp::ALL));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function noneMatch(callable $predicate) : bool
-    {
-        return $this->evaluate(new MatchOp($predicate, MatchOp::NONE));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function findFirst(callable $predicate = null)
-    {
-        return $this->evaluate(new FindOp($predicate));
-    }
-
-    /**
-     * Returns a callable comparator.
-     *
-     * @return callable
-     */
-    private static function defaultComparator() : callable
-    {
-        return function ($a, $b) {
-            if ($a === $b) {
-                return 0;
-            }
-
-            return ($a < $b) ? -1 : 1;
-        };
+        return $this->createMixedStream($this, function(Sink $sink) use ($skip) {
+            return new SliceSink($sink, $skip, null);
+        });
     }
 }

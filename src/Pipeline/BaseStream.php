@@ -24,6 +24,11 @@ use Iterator;
 use RuntimeException;
 
 use Pipeline\Sink;
+use Pipeline\Op\FindOp;
+use Pipeline\Op\MatchOp;
+use Pipeline\Op\ReduceOp;
+use Pipeline\Op\CollectOp;
+use Pipeline\Op\ForEachOp;
 
 /**
  * Base Stream Pipeline implementation
@@ -33,13 +38,6 @@ use Pipeline\Sink;
 abstract class BaseStream implements Stream
 {
     /**
-     * Backlink to the head of the pipeline chain (self if this is the source stage).
-     *
-     * @var BaseStream
-     */
-    protected $sourceStage;
-
-    /**
      * The "upstream" pipeline, or null if this is the source stage.
      *
      * @var BaseStream
@@ -47,11 +45,11 @@ abstract class BaseStream implements Stream
     protected $previousStage;
 
     /**
-     * True if this pipeline has been linked or consumed
+     * Backlink to the head of the pipeline chain (self if this is the source stage).
      *
-     * @var boolean
+     * @var BaseStream
      */
-    protected $consumed = false;
+    protected $sourceStage;
 
     /**
      * The source spliterator. Only valid for the head pipeline.
@@ -65,10 +63,111 @@ abstract class BaseStream implements Stream
      *
      * @param \Iterator $source
      */
-    protected function __construct(Iterator $source)
+    public function __construct(Iterator $source)
     {
         $this->source      = $source;
         $this->sourceStage = $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function forEach(callable $action)
+    {
+        $this->evaluate(new ForEachOp($action));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function toArray() : array
+    {
+        return $this->collect(Collectors::asArray());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reduce(callable $accumulator, $identity = null)
+    {
+        return $this->evaluate(new ReduceOp($accumulator, $identity));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function collect(Collector $collector)
+    {
+        return $this->evaluate(new CollectOp($collector));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function min(callable $comparator = null)
+    {
+        if ($comparator === null) {
+            $comparator = self::defaultComparator();
+        }
+
+        return $this->collect(Collectors::minBy($comparator));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function max(callable $comparator = null)
+    {
+        if ($comparator === null) {
+            $comparator = self::defaultComparator();
+        }
+
+        return $this->collect(Collectors::maxBy($comparator));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function count() : int
+    {
+        $count    = 0;
+        $callable = function ($_, int $state) {
+            return ++ $state;
+        };
+
+        return $this->evaluate(new ReduceOp($callable, $count));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function anyMatch(callable $predicate) : bool
+    {
+        return $this->evaluate(new MatchOp($predicate, MatchOp::ANY));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function allMatch(callable $predicate) : bool
+    {
+        return $this->evaluate(new MatchOp($predicate, MatchOp::ALL));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function noneMatch(callable $predicate) : bool
+    {
+        return $this->evaluate(new MatchOp($predicate, MatchOp::NONE));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function findFirst(callable $predicate = null)
+    {
+        return $this->evaluate(new FindOp($predicate));
     }
 
     /**
@@ -151,12 +250,6 @@ abstract class BaseStream implements Stream
      */
     protected function sourceIterator() : Iterator
     {
-        if ($this->sourceStage->consumed) {
-            throw new RuntimeException('Source already consumed or closed');
-        }
-
-        $this->sourceStage->consumed = true;
-
         return $this->sourceStage->source;
     }
 
@@ -173,5 +266,83 @@ abstract class BaseStream implements Stream
     protected function opWrapSink(Sink $sink) : Sink
     {
         return $sink;
+    }
+
+    /**
+     * Create a new mixed stream
+     *
+     * @param BaseStream $sourceStage
+     * @param callable   $opWrapSink
+     *
+     * @return \Pipeline\MixedStream
+     */
+    protected function createMixedStream(BaseStream $sourceStage, callable $opWrapSink) : MixedStream
+    {
+        return new class($sourceStage, $opWrapSink) extends Pipeline
+        {
+            private $callable;
+
+            public function __construct($self, $callable)
+            {
+                $this->sourceStage   = $self->sourceStage;
+                $this->callable      = $callable;
+                $this->previousStage = $self;
+            }
+
+            protected function opWrapSink(Sink $sink) : Sink
+            {
+                $callable = $this->callable;
+                $wrap     = $callable($sink);
+
+                return $wrap;
+            }
+        };
+    }
+
+    /**
+     * Create a new numeric stream
+     *
+     * @param BaseStream $sourceStage
+     * @param callable   $opWrapSink
+     *
+     * @return \Pipeline\NumericStream
+     */
+    protected function createNumericStream(BaseStream $sourceStage, callable $opWrapSink) : NumericStream
+    {
+        return new class($sourceStage, $opWrapSink) extends NumericPipeline
+        {
+            private $callable;
+
+            public function __construct($self, $callable)
+            {
+                $this->sourceStage   = $self->sourceStage;
+                $this->callable      = $callable;
+                $this->previousStage = $self;
+            }
+
+            protected function opWrapSink(Sink $sink) : Sink
+            {
+                $callable = $this->callable;
+                $wrap     = $callable($sink);
+
+                return $wrap;
+            }
+        };
+    }
+
+    /**
+     * Returns a callable comparator.
+     *
+     * @return callable
+     */
+    private static function defaultComparator() : callable
+    {
+        return function ($a, $b) {
+            if ($a === $b) {
+                return 0;
+            }
+
+            return ($a < $b) ? -1 : 1;
+        };
     }
 }

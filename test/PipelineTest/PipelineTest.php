@@ -5,13 +5,18 @@ namespace PipelineTest;
 use Iterator;
 use ArrayObject;
 use ArrayIterator;
-use Pipeline\Pipelines;
+use Pipeline\Stream;
+use Pipeline\Pipeline;
 use Pipeline\Collector;
 use Pipeline\Collectors;
-use Pipeline\Pipeline;
 
-class PipelineTest extends AbstractStreamTest
+class PipelineTest extends BaseStreamTest
 {
+    protected function createStream(Iterator $source) : Stream
+    {
+        return Pipeline::head($source);
+    }
+
     public function testMapToNumeric()
     {
         $values   = ['a', 'bb', 'ccc'];
@@ -47,8 +52,9 @@ class PipelineTest extends AbstractStreamTest
             ['key' => 'three', 'value' => '3 - 1']
         ];
 
-        $stream = Pipelines::of(...$values);
-        $result = $stream->collect(Collectors::groupingBy(function (array $item){
+        $iterator = new ArrayIterator($values);
+        $stream   = $this->createStream($iterator);
+        $result   = $stream->collect(Collectors::groupingBy(function (array $item){
             return $item['key'];
         }));
 
@@ -72,9 +78,11 @@ class PipelineTest extends AbstractStreamTest
 
     public function testPeek()
     {
-        $stream  = Pipelines::of('one', 'two', 'three', 'five');
-        $result  = new ArrayObject();
-        $mapping = [
+        $values   = ['one', 'two', 'three', 'five'];
+        $iterator = new ArrayIterator($values);
+        $stream   = $this->createStream($iterator);
+        $result   = new ArrayObject();
+        $mapping  = [
             'ONE'   => 11,
             'TWO'   => 22,
             'THREE' => 33
@@ -130,11 +138,6 @@ class PipelineTest extends AbstractStreamTest
         $this->assertEquals(13, $result['the']);
         $this->assertEquals(3, $result['copyright']);
         $this->assertEquals(2, $result['permission']);
-    }
-
-    protected function createStream(Iterator $source)
-    {
-        return Pipeline::head($source);
     }
 
     private function readFileLines() : Iterator

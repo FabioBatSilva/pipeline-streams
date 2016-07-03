@@ -5,13 +5,13 @@ namespace PipelineTest;
 use Iterator;
 use ArrayObject;
 use ArrayIterator;
-use Pipeline\Pipelines;
+use Pipeline\Stream;
 use Pipeline\Collector;
-use Pipeline\Collectors;
-use Pipeline\ReferencePipeline;
 
-abstract class AbstractStreamTest extends TestCase
+abstract class BaseStreamTest extends TestCase
 {
+    protected abstract function createStream(Iterator $source) : Stream;
+
     public function testReducePipeline()
     {
         $values   = [2, 4, 8, 18, 32];
@@ -248,6 +248,28 @@ abstract class AbstractStreamTest extends TestCase
         $this->assertEquals([1, 2, 3, 4, 5], $result);
     }
 
+    public function testPeek()
+    {
+        $peeks    = new ArrayObject();
+        $values   = [1, 2, 3, 4, 5];
+        $iterator = new ArrayIterator($values);
+        $stream   = $this->createStream($iterator);
+
+        $result = $stream
+            ->peek(function(int $e) use ($peeks) {
+                $peeks[] = $e;
+            })
+            ->filter(function(int $e) {
+                return ($e % 2 != 0);
+            })
+            ->toArray();
+
+        $this->assertCount(5, $peeks);
+        $this->assertCount(3, $result);
+        $this->assertEquals([1, 3, 5], $result);
+        $this->assertEquals([1, 2, 3, 4, 5], $peeks->getArrayCopy());
+    }
+
     public function testForEach()
     {
         $values   = array_reverse(range(0, 10));
@@ -274,6 +296,4 @@ abstract class AbstractStreamTest extends TestCase
         $this->assertEquals(4, $result[0]);
         $this->assertEquals(8, $result[1]);
     }
-
-    protected abstract function createStream(Iterator $source);
 }

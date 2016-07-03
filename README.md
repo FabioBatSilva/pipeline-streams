@@ -16,7 +16,7 @@ composer require pipeline-streams/pipeline-streams
 ```php
 <?php
 
-Pipelines::of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+Streams::of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
     ->filter(function(int $e) {
         return $e % 2 == 0;
     })
@@ -48,7 +48,7 @@ function readFileLines(string $file) : Iterator
 }
 
 $lines  = $this->readFileLines('./LICENSE');
-$result = Pipelines::wrap($lines)
+$result = Streams::wrap($lines)
     ->filter(function(string $line) {
         return strlen($line) > 1;
     })

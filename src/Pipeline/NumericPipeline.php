@@ -34,14 +34,14 @@ use Pipeline\Sink\DistinctSink;
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-class NumericPipeline extends Pipeline implements NumericStream
+class NumericPipeline extends BaseStream implements NumericStream
 {
     /**
      * Create a source stage of a NumericPipeline.
      *
      * @param \Iterator $source
      */
-    public static function head(Iterator $source) : Pipeline
+    public static function head(Iterator $source) : NumericPipeline
     {
         return new NumericPipeline($source);
     }
@@ -71,7 +71,7 @@ class NumericPipeline extends Pipeline implements NumericStream
         {
             private $callable;
 
-            protected function __construct($self, $callable)
+            public function __construct($self, $callable)
             {
                 $this->sourceStage   = $self->sourceStage;
                 $this->callable      = $callable;
@@ -94,7 +94,7 @@ class NumericPipeline extends Pipeline implements NumericStream
         {
             private $callable;
 
-            protected function __construct($self, $callable)
+            public function __construct($self, $callable)
             {
                 $this->sourceStage   = $self->sourceStage;
                 $this->callable      = $callable;
@@ -117,7 +117,7 @@ class NumericPipeline extends Pipeline implements NumericStream
         {
             private $callable;
 
-            protected function __construct($self, $callable)
+            public function __construct($self, $callable)
             {
                 $this->sourceStage   = $self->sourceStage;
                 $this->callable      = $callable;
@@ -138,7 +138,7 @@ class NumericPipeline extends Pipeline implements NumericStream
     {
         return new class($this) extends NumericPipeline
         {
-            protected function __construct($self)
+            public function __construct($self)
             {
                 $this->sourceStage   = $self->sourceStage;
                 $this->previousStage = $self;
@@ -160,7 +160,7 @@ class NumericPipeline extends Pipeline implements NumericStream
         {
             private $callable;
 
-            protected function __construct($self, $callable)
+            public function __construct($self, $callable)
             {
                 $this->sourceStage   = $self->sourceStage;
                 $this->callable      = $callable;
@@ -183,7 +183,7 @@ class NumericPipeline extends Pipeline implements NumericStream
         {
             private $callable;
 
-            protected function __construct($self, $callable)
+            public function __construct($self, $callable)
             {
                 $this->sourceStage   = $self->sourceStage;
                 $this->callable      = $callable;
@@ -206,7 +206,7 @@ class NumericPipeline extends Pipeline implements NumericStream
         {
             private $maxSize;
 
-            protected function __construct($self, $maxSize)
+            public function __construct($self, $maxSize)
             {
                 $this->sourceStage   = $self->sourceStage;
                 $this->maxSize       = $maxSize;
@@ -229,7 +229,7 @@ class NumericPipeline extends Pipeline implements NumericStream
         {
             private $skip;
 
-            protected function __construct($self, $skip)
+            public function __construct($self, $skip)
             {
                 $this->sourceStage   = $self->sourceStage;
                 $this->previousStage = $self;

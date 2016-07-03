@@ -28,7 +28,7 @@ use ArrayIterator;
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-final class Pipelines
+final class Streams
 {
     /**
      * Construct

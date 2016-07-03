@@ -47,16 +47,6 @@ interface Stream
     public function map(callable $mapper) : Stream;
 
     /**
-     * Returns an NumericStream consisting of the results of applying the
-     * given function to the elements of this stream.
-     *
-     * @param callable $mapper callable to apply to each element
-     *
-     * @return \Pipeline\NumericStream
-     */
-    public function mapToNumeric(callable $mapper) : NumericStream;
-
-    /**
      * Returns a stream consisting of the results of replacing each element of
      * this stream with the contents of a mapped stream produced by applying
      * the provided mapping function to each element.
@@ -66,17 +56,6 @@ interface Stream
      * @return \Pipeline\Stream
      */
     public function flatMap(callable $mapper) : Stream;
-
-    /**
-     * Returns an NumericStream consisting of the results of replacing each
-     * element of this stream with the contents of a mapped stream produced by
-     * applying the provided mapping function to each element.
-     *
-     * @param callable $mapper A function to apply to each element which produces a stream of new values
-     *
-     * @return \Pipeline\NumericStream
-     */
-    public function flatMapToNumeric(callable $mapper) : NumericStream;
 
     /**
      * Returns a stream consisting of the distinct elements.
@@ -167,7 +146,7 @@ interface Stream
      *
      * <code>
      * <?php
-     *  $sum = Streams::of(range(0, 100))
+     *  $sum = Streams::wrap(range(0, 100))
      *      ->reduce(function (int $identity, int $item) {
      *          return $identity + $item;
      *      }, 0);
