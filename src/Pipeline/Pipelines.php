@@ -66,11 +66,12 @@ final class Pipelines
         }
 
         if (is_array($source)) {
-            return self::of(...$source);
+            return Pipeline::head(new ArrayIterator($source));
         }
 
         throw new \InvalidArgumentException(sprintf(
-            'Invalid resource type: %s',
+            'Argument 1 passed to %s($source) must be an instance of array|\Iterator, %s given.',
+            __METHOD__,
             is_object($source) ? get_class($source) : gettype($source)
         ));
     }
