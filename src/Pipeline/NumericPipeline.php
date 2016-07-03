@@ -67,22 +67,9 @@ class NumericPipeline extends BaseStream implements NumericStream
      */
     public function filter(callable $predicate) : Stream
     {
-        return new class($this, $predicate) extends NumericPipeline
-        {
-            private $callable;
-
-            public function __construct($self, $callable)
-            {
-                $this->sourceStage   = $self->sourceStage;
-                $this->callable      = $callable;
-                $this->previousStage = $self;
-            }
-
-            protected function opWrapSink(Sink $sink) : Sink
-            {
-                return new FilterSink($sink, $this->callable);
-            }
-        };
+        return $this->createNumericStream($this, function(Sink $sink) use ($predicate) {
+            return new FilterSink($sink, $predicate);
+        });
     }
 
     /**
@@ -90,22 +77,9 @@ class NumericPipeline extends BaseStream implements NumericStream
      */
     public function map(callable $mapper) : Stream
     {
-        return new class($this, $mapper) extends NumericPipeline
-        {
-            private $callable;
-
-            public function __construct($self, $callable)
-            {
-                $this->sourceStage   = $self->sourceStage;
-                $this->callable      = $callable;
-                $this->previousStage = $self;
-            }
-
-            protected function opWrapSink(Sink $sink) : Sink
-            {
-                return new MapSink($sink, $this->callable);
-            }
-        };
+        return $this->createNumericStream($this, function(Sink $sink) use ($mapper) {
+            return new MapSink($sink, $mapper);
+        });
     }
 
     /**
@@ -113,22 +87,9 @@ class NumericPipeline extends BaseStream implements NumericStream
      */
     public function flatMap(callable $mapper) : Stream
     {
-        return new class($this, $mapper) extends NumericPipeline
-        {
-            private $callable;
-
-            public function __construct($self, $callable)
-            {
-                $this->sourceStage   = $self->sourceStage;
-                $this->callable      = $callable;
-                $this->previousStage = $self;
-            }
-
-            protected function opWrapSink(Sink $sink) : Sink
-            {
-                return new FlatMapSink($sink, $this->callable);
-            }
-        };
+        return $this->createNumericStream($this, function(Sink $sink) use ($mapper) {
+            return new FlatMapSink($sink, $mapper);
+        });
     }
 
     /**
@@ -136,19 +97,9 @@ class NumericPipeline extends BaseStream implements NumericStream
      */
     public function distinct() : Stream
     {
-        return new class($this) extends NumericPipeline
-        {
-            public function __construct($self)
-            {
-                $this->sourceStage   = $self->sourceStage;
-                $this->previousStage = $self;
-            }
-
-            protected function opWrapSink(Sink $sink) : Sink
-            {
-                return new DistinctSink($sink);
-            }
-        };
+        return $this->createNumericStream($this, function(Sink $sink) {
+            return new DistinctSink($sink);
+        });
     }
 
     /**
@@ -156,22 +107,9 @@ class NumericPipeline extends BaseStream implements NumericStream
      */
     public function sorted(callable $comparator = null) : Stream
     {
-        return new class($this, $comparator) extends NumericPipeline
-        {
-            private $callable;
-
-            public function __construct($self, $callable)
-            {
-                $this->sourceStage   = $self->sourceStage;
-                $this->callable      = $callable;
-                $this->previousStage = $self;
-            }
-
-            protected function opWrapSink(Sink $sink) : Sink
-            {
-                return new SortSink($sink, $this->callable);
-            }
-        };
+        return $this->createNumericStream($this, function(Sink $sink) use ($comparator) {
+            return new SortSink($sink, $comparator);
+        });
     }
 
     /**
@@ -179,22 +117,9 @@ class NumericPipeline extends BaseStream implements NumericStream
      */
     public function peek(callable $action) : Stream
     {
-        return new class($this, $action) extends NumericPipeline
-        {
-            private $callable;
-
-            public function __construct($self, $callable)
-            {
-                $this->sourceStage   = $self->sourceStage;
-                $this->callable      = $callable;
-                $this->previousStage = $self;
-            }
-
-            protected function opWrapSink(Sink $sink) : Sink
-            {
-                return new InvokeSink($sink, $this->callable);
-            }
-        };
+        return $this->createNumericStream($this, function(Sink $sink) use ($action) {
+            return new InvokeSink($sink, $action);
+        });
     }
 
     /**
@@ -202,22 +127,9 @@ class NumericPipeline extends BaseStream implements NumericStream
      */
     public function limit(int $maxSize) : Stream
     {
-        return new class($this, $maxSize) extends NumericPipeline
-        {
-            private $maxSize;
-
-            public function __construct($self, $maxSize)
-            {
-                $this->sourceStage   = $self->sourceStage;
-                $this->maxSize       = $maxSize;
-                $this->previousStage = $self;
-            }
-
-            protected function opWrapSink(Sink $sink) : Sink
-            {
-                return new SliceSink($sink, null, $this->maxSize);
-            }
-        };
+        return $this->createNumericStream($this, function(Sink $sink) use ($maxSize) {
+            return new SliceSink($sink, null, $maxSize);
+        });
     }
 
     /**
@@ -225,21 +137,8 @@ class NumericPipeline extends BaseStream implements NumericStream
      */
     public function skip(int $skip) : Stream
     {
-        return new class($this, $skip) extends NumericPipeline
-        {
-            private $skip;
-
-            public function __construct($self, $skip)
-            {
-                $this->sourceStage   = $self->sourceStage;
-                $this->previousStage = $self;
-                $this->skip          = $skip;
-            }
-
-            protected function opWrapSink(Sink $sink) : Sink
-            {
-                return new SliceSink($sink, $this->skip, null);
-            }
-        };
+        return $this->createNumericStream($this, function(Sink $sink) use ($skip) {
+            return new SliceSink($sink, $skip, null);
+        });
     }
 }
