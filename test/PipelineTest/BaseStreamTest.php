@@ -223,16 +223,21 @@ abstract class BaseStreamTest extends TestCase
 
         $collector
             ->expects($this->once())
-            ->method('get')
+            ->method('begin')
+            ->willReturn(0);
+
+        $collector
+            ->expects($this->once())
+            ->method('finish')
             ->willReturn(1 + 2 + 3);
 
         $collector
             ->expects($this->exactly(3))
             ->method('accept')
             ->withConsecutive(
-                $this->equalTo(1),
-                $this->equalTo(2),
-                $this->equalTo(3)
+                [$this->equalTo(0), $this->equalTo(1)],
+                [$this->equalTo(0), $this->equalTo(2)],
+                [$this->equalTo(0), $this->equalTo(3)]
             );
 
         $this->assertEquals(1 + 2 + 3, $stream->collect($collector));

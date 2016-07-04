@@ -56,25 +56,25 @@ final class MapCollector implements Collector
      */
     public function begin()
     {
-        $this->downstream->begin();
+        return $this->downstream->begin();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function accept($item)
+    public function accept($state, $item)
     {
         $callable = $this->callable;
         $result   = $callable($item);
 
-        $this->downstream->accept($result);
+        $this->downstream->accept($state, $result);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function get()
+    public function finish($state)
     {
-        return $this->downstream->get();
+        return $this->downstream->finish($state);
     }
 }

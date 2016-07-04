@@ -29,22 +29,27 @@ namespace Pipeline;
 interface Collector
 {
     /**
-     * Resets the sink state to receive a fresh data set.
+     * Resets the collector and return its fresh state.
+     *
+     * @return mixed
      */
     public function begin();
 
     /**
-     * Accumulates a input element
+     * Accumulates a input element into cumulative state.
      *
-     * @param mixed $item The input argument
+     * @param mixed $state
+     * @param mixed $item
      */
-    public function accept($item);
+    public function accept($state, $item);
 
     /**
-     * Returns cumulative results.
+     * Finishes the collector and return its final state.
      * Indicates that all elements have been pushed.
+     *
+     * @param mixed $state
      *
      * @return mixed
      */
-    public function get();
+    public function finish($state);
 }

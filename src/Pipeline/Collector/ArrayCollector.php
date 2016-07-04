@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace Pipeline\Collector;
 
+use ArrayObject;
 use Pipeline\Collector;
 
 /**
@@ -30,35 +31,26 @@ use Pipeline\Collector;
 final class ArrayCollector implements Collector
 {
     /**
-     * @var array
-     */
-    private $values;
-
-    /**
      * {@inheritdoc}
      */
     public function begin()
     {
-        $this->values = [];
+        return new ArrayObject();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function accept($item)
+    public function accept($state, $item)
     {
-        $this->values[] = $item;
+        $state[] = $item;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function get()
+    public function finish($state)
     {
-        $result = $this->values;
-
-        $this->values = null;
-
-        return $result;
+        return $state->getArrayCopy();
     }
 }

@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace Pipeline\Collector;
 
+use ArrayObject;
 use Pipeline\Collector;
 
 /**
@@ -30,21 +31,25 @@ use Pipeline\Collector;
 final class GroupByCollector implements Collector
 {
     /**
-     * @var array
-     */
-    private $values;
-
-    /**
      * @var callable
      */
     private $classifier;
 
     /**
-     * @param callable $classifier
+     * @var \Pipeline\Collector
      */
-    public function __construct(callable $classifier)
+    protected $downstream;
+
+    /**
+     * Constructor.
+     *
+     * @param callable            $classifier
+     * @param \Pipeline\Collector $downstream
+     */
+    public function __construct(callable $classifier, Collector $downstream)
     {
         $this->classifier = $classifier;
+        $this->downstream = $downstream;
     }
 
     /**
@@ -52,29 +57,25 @@ final class GroupByCollector implements Collector
      */
     public function begin()
     {
-        $this->values = [];
+        return new ArrayObject();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function accept($item)
+    public function accept($state, $item)
     {
         $callable = $this->classifier;
         $itemKey  = $callable($item);
 
-        $this->values[$itemKey][] = $item;
+        $state[$itemKey][] = $item;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function get()
+    public function finish($state)
     {
-        $result = $this->values;
-
-        $this->values = null;
-
-        return $result;
+        return $state->getArrayCopy();
     }
 }

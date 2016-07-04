@@ -73,12 +73,14 @@ final class MinMaxCollector implements Collector
     {
         $this->value    = null;
         $this->hasValue = false;
+
+        return null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function accept($item)
+    public function accept($state, $item)
     {
         if ( ! $this->hasValue) {
             $this->value    = $item;
@@ -98,7 +100,7 @@ final class MinMaxCollector implements Collector
     /**
      * {@inheritdoc}
      */
-    public function get()
+    public function finish($state)
     {
         $result = $this->value;
 

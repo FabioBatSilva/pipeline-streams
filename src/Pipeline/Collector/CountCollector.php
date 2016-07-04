@@ -39,13 +39,13 @@ final class CountCollector implements Collector
      */
     public function begin()
     {
-        $this->count = 0;
+        return $this->count = 0;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function accept($item)
+    public function accept($state, $item)
     {
         $this->count ++;
     }
@@ -53,8 +53,12 @@ final class CountCollector implements Collector
     /**
      * {@inheritdoc}
      */
-    public function get()
+    public function finish($state)
     {
-        return $this->count;
+        $result = $this->count;
+
+        $this->count = null;
+
+        return $result;
     }
 }

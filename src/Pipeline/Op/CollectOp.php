@@ -37,6 +37,11 @@ final class CollectOp extends BaseTerminalOp
     private $collector;
 
     /**
+     * @var mixed
+     */
+    private $state;
+
+    /**
      * Construct
      *
      * @param Collector $collector
@@ -51,7 +56,10 @@ final class CollectOp extends BaseTerminalOp
      */
     public function begin()
     {
-        return $this->collector->begin();
+        $collector = $this->collector;
+        $state     = $collector->begin();
+
+        $this->state = $state;
     }
 
     /**
@@ -59,7 +67,7 @@ final class CollectOp extends BaseTerminalOp
      */
     public function accept($item)
     {
-        $this->collector->accept($item);
+        $this->collector->accept($this->state, $item);
     }
 
     /**
@@ -67,6 +75,11 @@ final class CollectOp extends BaseTerminalOp
      */
     public function get()
     {
-        return $this->collector->get();
+        $collector = $this->collector;
+        $state     = $collector->finish($this->state);
+
+        $this->state = null;
+
+        return $state;
     }
 }

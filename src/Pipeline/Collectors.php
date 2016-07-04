@@ -135,6 +135,10 @@ final class Collectors
      */
     public static function groupingBy(callable $classifier, Collector $downstream = null)
     {
+        if ($downstream === null) {
+            $downstream = self::asArray();
+        }
+
         return new GroupByCollector($classifier, $downstream);
     }
 }

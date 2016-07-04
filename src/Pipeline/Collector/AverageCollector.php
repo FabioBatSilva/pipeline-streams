@@ -46,12 +46,14 @@ final class AverageCollector implements Collector
     {
         $this->sum   = 0;
         $this->count = 0;
+
+        return 0;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function accept($item)
+    public function accept($state, $item)
     {
         $this->sum   += $item;
         $this->count += 1;
@@ -60,7 +62,7 @@ final class AverageCollector implements Collector
     /**
      * {@inheritdoc}
      */
-    public function get()
+    public function finish($state)
     {
         $result = ($this->count > 0)
             ? ($this->sum / $this->count)

@@ -40,13 +40,13 @@ final class SumCollector implements Collector
      */
     public function begin()
     {
-        $this->sum = 0;
+        return $this->sum = 0;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function accept($item)
+    public function accept($state, $item)
     {
         $this->sum += $item;
     }
@@ -54,7 +54,7 @@ final class SumCollector implements Collector
     /**
      * {@inheritdoc}
      */
-    public function get()
+    public function finish($state)
     {
         $result = $this->sum;
 

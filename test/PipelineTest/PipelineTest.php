@@ -99,7 +99,7 @@ class PipelineTest extends BaseStreamTest
 
         $iterator = new ArrayIterator($values);
         $stream   = $this->createStream($iterator);
-        $result   = $stream->collect($groupBy, $mapCount);
+        $result   = $stream->collect($groupByKey, $mapValues);
 
         $this->assertArrayHasKey('one', $result);
         $this->assertArrayHasKey('two', $result);
