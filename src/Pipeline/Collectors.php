@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace Pipeline;
 
+use Pipeline\Collector\MapCollector;
 use Pipeline\Collector\SumCollector;
 use Pipeline\Collector\CountCollector;
 use Pipeline\Collector\ArrayCollector;
@@ -106,15 +107,34 @@ final class Collectors
     }
 
     /**
-     * Returns a Collector implementing a "group by" operation on input elements,
-     * grouping elements according to a classification function, and returning the results in a array.
+     * Returns a Collector implementing a "map" operation on input elements
+     * and and pusing it down to a collector which will accept mapped values.
      *
-     * @param callable $comparator
+     * @param callable            $mapper
+     * @param \Pipeline\Collector $downstream
      *
      * @return \Pipeline\Collector
      */
-    public static function groupingBy(callable $classifier)
+    public static function mapping(callable $mapper, Collector $downstream = null)
     {
-        return new GroupByCollector($classifier);
+        if ($downstream === null) {
+            $downstream = self::asArray();
+        }
+
+        return new MapCollector($mapper, $downstream);
+    }
+
+    /**
+     * Returns a Collector implementing a "group by" operation on input elements,
+     * grouping elements according to a classification function, and returning the results in a array.
+     *
+     * @param callable            $comparator
+     * @param \Pipeline\Collector $downstream
+     *
+     * @return \Pipeline\Collector
+     */
+    public static function groupingBy(callable $classifier, Collector $downstream = null)
+    {
+        return new GroupByCollector($classifier, $downstream);
     }
 }
