@@ -4,24 +4,24 @@ namespace PipelineTest;
 
 use PipelineTest\TestCase;
 
-use Pipeline\Sink\FlatMapSink;
+use Pipeline\Sink\MapSink;
 
-class FlatMapSinkTest extends TestCase
+class MapSinkTest extends TestCase
 {
     public function testSink()
     {
         $downstream = $this->createMock('Pipeline\Sink');
-        $sink       = new FlatMapSink($downstream, function (array $item) {
-            return $item['values'];
+        $sink       = new MapSink($downstream, function (string $item) {
+            return strtoupper($item);
         });
 
         $downstream
             ->expects($this->exactly(3))
             ->method('accept')
             ->withConsecutive(
-                $this->equalTo(1),
-                $this->equalTo(2),
-                $this->equalTo(3)
+                $this->equalTo('ONE'),
+                $this->equalTo('TWO'),
+                $this->equalTo('THREE')
             );
 
         $downstream
@@ -39,17 +39,9 @@ class FlatMapSinkTest extends TestCase
 
         $sink->begin();
 
-        $sink->accept([
-            'values' => [1, 2]
-        ]);
-
-        $sink->accept([
-            'values' => null
-        ]);
-
-        $sink->accept([
-            'values' => [3]
-        ]);
+        $sink->accept('one');
+        $sink->accept('two');
+        $sink->accept('three');
 
         $sink->end();
 

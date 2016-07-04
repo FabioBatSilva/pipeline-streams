@@ -4,16 +4,14 @@ namespace PipelineTest;
 
 use PipelineTest\TestCase;
 
-use Pipeline\Sink\FlatMapSink;
+use Pipeline\Sink\DistinctSink;
 
-class FlatMapSinkTest extends TestCase
+class DistinctSinkTest extends TestCase
 {
     public function testSink()
     {
         $downstream = $this->createMock('Pipeline\Sink');
-        $sink       = new FlatMapSink($downstream, function (array $item) {
-            return $item['values'];
-        });
+        $sink       = new DistinctSink($downstream);
 
         $downstream
             ->expects($this->exactly(3))
@@ -39,17 +37,12 @@ class FlatMapSinkTest extends TestCase
 
         $sink->begin();
 
-        $sink->accept([
-            'values' => [1, 2]
-        ]);
-
-        $sink->accept([
-            'values' => null
-        ]);
-
-        $sink->accept([
-            'values' => [3]
-        ]);
+        $sink->accept(1);
+        $sink->accept(1);
+        $sink->accept(2);
+        $sink->accept(3);
+        $sink->accept(3);
+        $sink->accept(1);
 
         $sink->end();
 

@@ -50,6 +50,8 @@ final class DistinctSink extends ChainSink
     public function begin()
     {
         $this->values = [];
+
+        $this->downstream->begin();
     }
 
     /**
@@ -63,5 +65,15 @@ final class DistinctSink extends ChainSink
 
         $this->values[] = $item;
         $this->downstream->accept($item);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function end()
+    {
+        $this->values = null;
+
+        $this->downstream->end();
     }
 }

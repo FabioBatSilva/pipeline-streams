@@ -42,7 +42,7 @@ final class SortSink extends ChainSink
     /**
      * @var integer
      */
-    private $offset = 0;
+    private $offset;
 
     /**
      * Constructor.
@@ -90,8 +90,8 @@ final class SortSink extends ChainSink
             }
         }
 
-        $this->offset = 0;
-        $this->values = [];
+        $this->offset = null;
+        $this->values = null;
 
         $this->downstream->end();
     }

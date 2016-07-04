@@ -91,6 +91,10 @@ final class SliceSink extends ChainSink
      */
     public function cancellationRequested() : bool
     {
-        return ($this->limit !== null && $this->offset > $this->limit);
+        if ($this->limit !== null && $this->offset >= $this->limit) {
+            return true;
+        }
+
+        return $this->downstream->cancellationRequested();
     }
 }
