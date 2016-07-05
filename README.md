@@ -52,7 +52,6 @@ Streams::wrap(range(1, 10))
     ->forEach(function(int $e) {
         var_dump($e);
     });
-
 ```
 
 
