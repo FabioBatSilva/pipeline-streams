@@ -30,24 +30,14 @@ use Pipeline\Collector;
 final class AverageCollector implements Collector
 {
     /**
-     * @var int|float
-     */
-    private $sum;
-
-    /**
-     * @var int
-     */
-    private $count;
-
-    /**
      * {@inheritdoc}
      */
     public function begin()
     {
-        $this->sum   = 0;
-        $this->count = 0;
-
-        return 0;
+        return (object) [
+            'sum'   => 0,
+            'count' => 0
+        ];
     }
 
     /**
@@ -55,8 +45,8 @@ final class AverageCollector implements Collector
      */
     public function accept($state, $item)
     {
-        $this->sum   += $item;
-        $this->count += 1;
+        $state->sum   += $item;
+        $state->count += 1;
     }
 
     /**
@@ -64,13 +54,8 @@ final class AverageCollector implements Collector
      */
     public function finish($state)
     {
-        $result = ($this->count > 0)
-            ? ($this->sum / $this->count)
+        return ($state->count > 0)
+            ? ($state->sum / $state->count)
             : 0;
-
-        $this->sum   = null;
-        $this->count = null;
-
-        return $result;
     }
 }

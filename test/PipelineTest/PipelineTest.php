@@ -78,8 +78,6 @@ class PipelineTest extends BaseStreamTest
 
     public function testCollectGroupByMapping()
     {
-        $this->markTestIncomplete('Not implemented yet.');
-
         $values = [
             ['key' => 'one',   'value' => [1, 1]],
             ['key' => 'one',   'value' => [1, 2]],
@@ -89,13 +87,13 @@ class PipelineTest extends BaseStreamTest
             ['key' => 'three', 'value' => [3, 1]]
         ];
 
-        $groupByKey = Collectors::groupingBy(function (array $item){
-            return $item['key'];
-        });
-
-        $mapValues = Collectors::mapping(function (array $item){
+        $mapValues = Collectors::mapping(function (array $item) {
             return implode(' - ', $item['value']);
         });
+
+        $groupByKey = Collectors::groupingBy(function (array $item) {
+            return $item['key'];
+        }, $mapValues);
 
         $iterator = new ArrayIterator($values);
         $stream   = $this->createStream($iterator);
@@ -192,15 +190,9 @@ class PipelineTest extends BaseStreamTest
             ->flatMap(function(string $line) {
                 return explode(' ', $line);
             })
-            ->reduce(function (string $word, array $counters) {
-                if (!isset($counters[$word])) {
-                    $counters[$word] = 0;
-                }
-
-                $counters[$word] ++;
-
-                return $counters;
-            }, []);
+            ->collect(Collectors::groupingBy(function (string $word) {
+                return $word;
+            }, Collectors::counting()));
 
         $this->assertCount(100, $result);
         $this->assertEquals(13, $result['the']);

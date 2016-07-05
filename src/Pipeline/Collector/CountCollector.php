@@ -30,16 +30,11 @@ use Pipeline\Collector;
 final class CountCollector implements Collector
 {
     /**
-     * @var int
-     */
-    private $count;
-
-    /**
      * {@inheritdoc}
      */
     public function begin()
     {
-        return $this->count = 0;
+        return (object) ['count' => 0];
     }
 
     /**
@@ -47,7 +42,7 @@ final class CountCollector implements Collector
      */
     public function accept($state, $item)
     {
-        $this->count ++;
+        $state->count ++;
     }
 
     /**
@@ -55,10 +50,6 @@ final class CountCollector implements Collector
      */
     public function finish($state)
     {
-        $result = $this->count;
-
-        $this->count = null;
-
-        return $result;
+        return $state->count;
     }
 }

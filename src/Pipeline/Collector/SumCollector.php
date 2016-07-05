@@ -31,16 +31,11 @@ use Pipeline\Collector;
 final class SumCollector implements Collector
 {
     /**
-     * @var int|float
-     */
-    private $sum;
-
-    /**
      * {@inheritdoc}
      */
     public function begin()
     {
-        return $this->sum = 0;
+        return (object) ['sum' => 0];
     }
 
     /**
@@ -48,7 +43,7 @@ final class SumCollector implements Collector
      */
     public function accept($state, $item)
     {
-        $this->sum += $item;
+        $state->sum += $item;
     }
 
     /**
@@ -56,10 +51,6 @@ final class SumCollector implements Collector
      */
     public function finish($state)
     {
-        $result = $this->sum;
-
-        $this->sum = null;
-
-        return $result;
+        return $state->sum;
     }
 }

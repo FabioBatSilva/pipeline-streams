@@ -68,7 +68,11 @@ final class GroupByCollector implements Collector
         $callable = $this->classifier;
         $itemKey  = $callable($item);
 
-        $state[$itemKey][] = $item;
+        if ( ! isset($state[$itemKey])) {
+            $state[$itemKey] = $this->downstream->begin();
+        }
+
+        $this->downstream->accept($state[$itemKey], $item);
     }
 
     /**
@@ -76,6 +80,12 @@ final class GroupByCollector implements Collector
      */
     public function finish($state)
     {
-        return $state->getArrayCopy();
+        $values = [];
+
+        foreach ($state as $key => $value) {
+            $values[$key] = $this->downstream->finish($value);
+        }
+
+        return $values;
     }
 }

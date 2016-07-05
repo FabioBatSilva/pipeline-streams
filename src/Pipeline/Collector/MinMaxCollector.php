@@ -45,16 +45,6 @@ final class MinMaxCollector implements Collector
     private $type;
 
     /**
-     * @var mixed
-     */
-    private $value;
-
-    /**
-     * @var bool
-     */
-    private $hasValue;
-
-    /**
      * Construct
      *
      * @param callable $comparator
@@ -71,10 +61,10 @@ final class MinMaxCollector implements Collector
      */
     public function begin()
     {
-        $this->value    = null;
-        $this->hasValue = false;
-
-        return null;
+        return (object) [
+            'value'    => null,
+            'hasValue' => false
+        ];
     }
 
     /**
@@ -82,18 +72,18 @@ final class MinMaxCollector implements Collector
      */
     public function accept($state, $item)
     {
-        if ( ! $this->hasValue) {
-            $this->value    = $item;
-            $this->hasValue = true;
+        if ( ! $state->hasValue) {
+            $state->value    = $item;
+            $state->hasValue = true;
 
             return;
         }
 
         $comparator = $this->comparator;
-        $result     = $comparator($this->value, $item);
+        $result     = $comparator($state->value, $item);
 
         if ($result === $this->type) {
-            $this->value = $item;
+            $state->value = $item;
         }
     }
 
@@ -102,11 +92,6 @@ final class MinMaxCollector implements Collector
      */
     public function finish($state)
     {
-        $result = $this->value;
-
-        $this->value    = null;
-        $this->hasValue = null;
-
-        return $result;
+        return $state->value;
     }
 }
