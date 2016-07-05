@@ -1,4 +1,4 @@
-# Package Versions
+# pipeline-streams
 
 This library support functional-style operations on streams of elements, such as map-reduce transformations on interators and arrays.
 
