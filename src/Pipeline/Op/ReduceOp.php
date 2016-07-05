@@ -59,14 +59,6 @@ final class ReduceOp extends BaseTerminalOp
     /**
      * {@inheritdoc}
      */
-    public function get()
-    {
-        return $this->state;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function begin()
     {
         $this->state = $this->identity;
@@ -81,5 +73,13 @@ final class ReduceOp extends BaseTerminalOp
         $state    = $callable($this->state, $item);
 
         $this->state = $state;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function get()
+    {
+        return $this->state;
     }
 }

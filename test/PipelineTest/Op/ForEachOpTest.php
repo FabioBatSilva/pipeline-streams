@@ -12,7 +12,6 @@ class ForEachOpTest extends TestCase
     public function testTerminalOp()
     {
         $calls      = new ArrayObject();
-        $collector  = $this->createMock('Pipeline\Collector');
         $terminalOp = new ForEachOp(function (int $e) use ($calls) {
             $calls[] = $e;
         });

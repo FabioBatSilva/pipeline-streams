@@ -24,6 +24,7 @@ use Pipeline\Collector\MapCollector;
 use Pipeline\Collector\SumCollector;
 use Pipeline\Collector\CountCollector;
 use Pipeline\Collector\ArrayCollector;
+use Pipeline\Collector\ConcatCollector;
 use Pipeline\Collector\MinMaxCollector;
 use Pipeline\Collector\AverageCollector;
 use Pipeline\Collector\GroupByCollector;
@@ -58,6 +59,18 @@ final class Collectors
     public static function counting()
     {
         return new CountCollector();
+    }
+
+    /**
+     * Returns a Collector that concatenates the input elements
+     *
+     * @param string $delimiter
+     *
+     * @return \Pipeline\Collector
+     */
+    public static function joining(string $delimiter = ',')
+    {
+        return new ConcatCollector($delimiter);
     }
 
     /**

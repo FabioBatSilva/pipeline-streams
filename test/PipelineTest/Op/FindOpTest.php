@@ -10,7 +10,6 @@ class FindOpTest extends TestCase
 {
     public function testTerminalOpFindFirst()
     {
-        $collector  = $this->createMock('Pipeline\Collector');
         $terminalOp = new FindOp();
 
         $terminalOp->begin();
@@ -26,7 +25,6 @@ class FindOpTest extends TestCase
 
     public function testTerminalOpFindCallable()
     {
-        $collector  = $this->createMock('Pipeline\Collector');
         $terminalOp = new FindOp(function (int $e) {
             return $e === 3;
         });

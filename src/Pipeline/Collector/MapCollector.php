@@ -37,7 +37,7 @@ final class MapCollector implements Collector
     /**
      * @var \Pipeline\Collector
      */
-    protected $downstream;
+    private $downstream;
 
     /**
      * Constructor.

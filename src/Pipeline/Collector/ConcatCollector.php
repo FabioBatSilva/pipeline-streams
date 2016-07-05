@@ -24,32 +24,26 @@ use ArrayObject;
 use Pipeline\Collector;
 
 /**
- * Collector implementing a "group by" operation on input elements.
+ * Returns a Collector that concatenates the input elements,
+ * separated by the specified delimiter, in encounter order
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-final class GroupByCollector implements Collector
+final class ConcatCollector implements Collector
 {
     /**
-     * @var callable
+     * @var string
      */
-    private $classifier;
-
-    /**
-     * @var \Pipeline\Collector
-     */
-    private $downstream;
+    private $delimiter;
 
     /**
      * Constructor.
      *
-     * @param callable            $classifier
-     * @param \Pipeline\Collector $downstream
+     * @param string $delimiter
      */
-    public function __construct(callable $classifier, Collector $downstream)
+    public function __construct(string $delimiter)
     {
-        $this->classifier = $classifier;
-        $this->downstream = $downstream;
+        $this->delimiter = $delimiter;
     }
 
     /**
@@ -65,14 +59,7 @@ final class GroupByCollector implements Collector
      */
     public function accept($state, $item)
     {
-        $callable = $this->classifier;
-        $itemKey  = $callable($item);
-
-        if ( ! isset($state[$itemKey])) {
-            $state[$itemKey] = $this->downstream->begin();
-        }
-
-        $this->downstream->accept($state[$itemKey], $item);
+        $state[] = $item;
     }
 
     /**
@@ -80,12 +67,9 @@ final class GroupByCollector implements Collector
      */
     public function finish($state)
     {
-        $values = [];
+        $pieces = $state->getArrayCopy();
+        $result = implode($this->delimiter, $pieces);
 
-        foreach ($state as $key => $value) {
-            $values[$key] = $this->downstream->finish($value);
-        }
-
-        return $values;
+        return $result;
     }
 }
