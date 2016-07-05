@@ -1,7 +1,3 @@
----
-title: Contributing
----
-
 # Contributing
 
  * Coding standard for the project is [PSR-2](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-2-coding-style-guide.md)
@@ -15,12 +11,12 @@ title: Contributing
 To install the project and run the tests, you need to clone it first:
 
 ```sh
-$ git clone git://github.com/FabioBatSilva/pipeline.git
+$ git clone git://github.com/FabioBatSilva/pipeline-streams.git
 ```
 
 ## Testing
 
-The PHPUnit version to be used is the one installed as a dev- dependency via composer:
+The PHPUnit version to be used is the one installed as a -dev dependency via composer:
 
 ```sh
 $ ./vendor/bin/phpunit
