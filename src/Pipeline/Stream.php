@@ -152,12 +152,12 @@ interface Stream
      *      }, 0);
      * </code>
      *
+     * @param mixed    $state       The initial state value
      * @param callable $accumulator Callback function for combining two values
-     * @param mixed    $identity    The initial value for the accumulating function
      *
      * @return mixed
      */
-    public function reduce(callable $accumulator, $identity = null);
+    public function reduce($state, callable $accumulator);
 
     /**
      * Performs a a operation on the elements of this stream using a Collector

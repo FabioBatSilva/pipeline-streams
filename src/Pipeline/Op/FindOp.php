@@ -57,15 +57,7 @@ final class FindOp extends BaseTerminalOp
     /**
      * {@inheritdoc}
      */
-    public function get()
-    {
-        return $this->value;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function begin(int $size = null)
+    public function begin()
     {
         $this->value    = null;
         $this->hasValue = false;
@@ -90,6 +82,14 @@ final class FindOp extends BaseTerminalOp
             $this->value    = $item;
             $this->hasValue = true;
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function get()
+    {
+        return $this->value;
     }
 
     /**

@@ -58,6 +58,8 @@ final class ForEachOp extends BaseTerminalOp
      */
     public function accept($item)
     {
-        call_user_func($this->consumer, $item);
+        $consumer = $this->consumer;
+
+        $consumer($item);
     }
 }

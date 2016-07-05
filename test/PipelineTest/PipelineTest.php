@@ -22,7 +22,7 @@ class PipelineTest extends BaseStreamTest
         $values   = ['a', 'bb', 'ccc'];
         $iterator = new ArrayIterator($values);
         $stream   = $this->createStream($iterator);
-        $result = $stream->mapToNumeric(function(string $e) {
+        $result   = $stream->mapToNumeric(function(string $e) {
             return strlen($e);
         })->sum();
 

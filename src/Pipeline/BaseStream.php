@@ -88,9 +88,9 @@ abstract class BaseStream implements Stream
     /**
      * {@inheritdoc}
      */
-    public function reduce(callable $accumulator, $identity = null)
+    public function reduce($state, callable $accumulator)
     {
-        return $this->evaluate(new ReduceOp($accumulator, $identity));
+        return $this->evaluate(new ReduceOp($accumulator, $state));
     }
 
     /**

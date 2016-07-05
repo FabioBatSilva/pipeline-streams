@@ -89,7 +89,7 @@ final class MatchOp extends BaseTerminalOp
     /**
      * {@inheritdoc}
      */
-    public function begin(int $size = null)
+    public function begin()
     {
         $this->cancel = false;
         $this->result = false;

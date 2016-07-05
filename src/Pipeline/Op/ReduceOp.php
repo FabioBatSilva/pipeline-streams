@@ -50,7 +50,7 @@ final class ReduceOp extends BaseTerminalOp
      * @param callable $accumulator
      * @param mixed    $identity
      */
-    public function __construct(callable $accumulator, $identity = null)
+    public function __construct(callable $accumulator, $identity)
     {
         $this->identity    = $identity;
         $this->accumulator = $accumulator;
@@ -67,7 +67,7 @@ final class ReduceOp extends BaseTerminalOp
     /**
      * {@inheritdoc}
      */
-    public function begin(int $size = null)
+    public function begin()
     {
         $this->state = $this->identity;
     }
@@ -78,7 +78,7 @@ final class ReduceOp extends BaseTerminalOp
     public function accept($item)
     {
         $callable = $this->accumulator;
-        $state    = $callable($item, $this->state);
+        $state    = $callable($this->state, $item);
 
         $this->state = $state;
     }

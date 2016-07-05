@@ -17,9 +17,9 @@ abstract class BaseStreamTest extends TestCase
         $values   = [2, 4, 8, 18, 32];
         $iterator = new ArrayIterator($values);
         $stream   = $this->createStream($iterator);
-        $result   = $stream->reduce(function(int $item, $state) {
+        $result   = $stream->reduce(0, function(int $state, int $item) {
             return $state + $item;
-        }, 0);
+        });
 
         $this->assertEquals(64, $result);
     }
