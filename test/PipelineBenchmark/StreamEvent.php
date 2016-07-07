@@ -101,7 +101,8 @@ class StreamEvent extends AthleticEvent
         $result   = $stream
             ->flatMap(function(int $e) {
                 return array_fill(0, 10, $e);
-            })->distinct()
+            })
+            ->distinct()
             ->count();
 
         assert($result === 1000);
