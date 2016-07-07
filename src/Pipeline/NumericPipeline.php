@@ -37,16 +37,6 @@ use Pipeline\Sink\DistinctSink;
 class NumericPipeline extends BaseStream implements NumericStream
 {
     /**
-     * Create a source stage of a NumericPipeline.
-     *
-     * @param \Iterator $source
-     */
-    public static function head(Iterator $source) : NumericPipeline
-    {
-        return new NumericPipeline($source);
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function average()

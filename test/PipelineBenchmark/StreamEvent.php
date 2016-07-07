@@ -70,4 +70,40 @@ class StreamEvent extends AthleticEvent
         assert($peeks->count === 500);
         assert($result === 500);
     }
+
+    /**
+     * @iterations 1000
+     */
+    public function filterFlatMap()
+    {
+        $iterator = $this->createIntIterator(1000);
+        $stream   = Streams::wrap($iterator);
+        $result   = $stream
+            ->filter(function(int $e) {
+                return $e % 2 == 0;
+            })->flatMapToNumeric(function(int $e) {
+                return [$e, $e / 2];
+            })->map(function(int $e) {
+                return $e * $e;
+            })
+            ->sum();
+
+        assert($result === 207708750);
+    }
+
+    /**
+     * @iterations 1000
+     */
+    public function flatMapDistinct()
+    {
+        $iterator = $this->createIntIterator(1000);
+        $stream   = Streams::wrap($iterator);
+        $result   = $stream
+            ->flatMap(function(int $e) {
+                return array_fill(0, 10, $e);
+            })->distinct()
+            ->count();
+
+        assert($result === 1000);
+    }
 }

@@ -14,7 +14,7 @@ class PipelineTest extends BaseStreamTest
 {
     protected function createStream(Iterator $source) : Stream
     {
-        return Pipeline::head($source);
+        return new Pipeline($source);
     }
 
     public function testMapToNumeric()

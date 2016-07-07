@@ -10,6 +10,6 @@ class NumericPipelineTest extends BaseStreamTest
 {
     protected function createStream(Iterator $source) : Stream
     {
-        return NumericPipeline::head($source);
+        return new NumericPipeline($source);
     }
 }

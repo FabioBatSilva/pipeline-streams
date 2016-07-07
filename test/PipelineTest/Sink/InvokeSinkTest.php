@@ -1,6 +1,6 @@
 <?php
 
-namespace PipelineTest;
+namespace PipelineTest\Sink;
 
 use PipelineTest\TestCase;
 

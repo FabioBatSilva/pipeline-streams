@@ -45,7 +45,7 @@ final class Streams
     public static function of(...$values)
     {
         $iterator = new ArrayIterator($values);
-        $pipeline = Pipeline::head($iterator);
+        $pipeline = new Pipeline($iterator);
 
         return $pipeline;
     }
@@ -62,11 +62,11 @@ final class Streams
     public static function wrap($source)
     {
         if ($source instanceof Iterator) {
-            return Pipeline::head($source);
+            return new Pipeline($source);
         }
 
         if (is_array($source)) {
-            return Pipeline::head(new ArrayIterator($source));
+            return new Pipeline(new ArrayIterator($source));
         }
 
         throw new \InvalidArgumentException(sprintf(

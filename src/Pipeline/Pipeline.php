@@ -38,16 +38,6 @@ use Pipeline\Sink\DistinctSink;
 class Pipeline extends BaseStream implements MixedStream
 {
     /**
-     * Create a source stage of a Pipeline.
-     *
-     * @param \Iterator $source
-     */
-    public static function head(Iterator $source) : Pipeline
-    {
-        return new Pipeline($source);
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function filter(callable $predicate) : Stream
