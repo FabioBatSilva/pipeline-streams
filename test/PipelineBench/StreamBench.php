@@ -1,24 +1,24 @@
 <?php
 
-namespace PipelineBenchmark;
+namespace PipelineBench;
 
 use Iterator;
 use Pipeline\Streams;
-use Athletic\AthleticEvent;
 
-class StreamEvent extends AthleticEvent
+/**
+ * @Warmup(2)
+ * @Revs(1000)
+ */
+class StreamBench
 {
-    public function createIntIterator(int $size) : Iterator
+    private function createIntIterator(int $size) : Iterator
     {
         for ($i=0; $i < $size; $i++) {
             yield $i;
         }
     }
 
-    /**
-     * @iterations 1000
-     */
-    public function filter()
+    public function benchFilter()
     {
         $iterator = $this->createIntIterator(1000);
         $stream   = Streams::wrap($iterator);
@@ -31,10 +31,7 @@ class StreamEvent extends AthleticEvent
         assert($result === 500);
     }
 
-    /**
-     * @iterations 1000
-     */
-    public function filterMap()
+    public function benchFilterMap()
     {
         $iterator = $this->createIntIterator(1000);
         $stream   = Streams::wrap($iterator);
@@ -49,10 +46,7 @@ class StreamEvent extends AthleticEvent
         assert($result === 500);
     }
 
-    /**
-     * @iterations 1000
-     */
-    public function filterMapPeek()
+    public function benchFilterMapPeek()
     {
         $iterator = $this->createIntIterator(1000);
         $stream   = Streams::wrap($iterator);
@@ -71,10 +65,7 @@ class StreamEvent extends AthleticEvent
         assert($result === 500);
     }
 
-    /**
-     * @iterations 1000
-     */
-    public function filterFlatMap()
+    public function benchFilterFlatMap()
     {
         $iterator = $this->createIntIterator(1000);
         $stream   = Streams::wrap($iterator);
@@ -91,10 +82,7 @@ class StreamEvent extends AthleticEvent
         assert($result === 207708750);
     }
 
-    /**
-     * @iterations 1000
-     */
-    public function flatMapDistinct()
+    public function benchFlatMapDistinct()
     {
         $iterator = $this->createIntIterator(1000);
         $stream   = Streams::wrap($iterator);
