@@ -3,7 +3,7 @@
 namespace PipelineBench;
 
 use Iterator;
-use Pipeline\Streams;
+use Pipeline\Pipeline;
 
 /**
  * @Warmup(2)
@@ -21,7 +21,7 @@ class StreamBench
     public function benchFilter()
     {
         $iterator = $this->createIntIterator(1000);
-        $stream   = Streams::wrap($iterator);
+        $stream   = Pipeline::wrap($iterator);
         $result   = $stream
             ->filter(function(int $e) {
                 return $e % 2 == 0;
@@ -34,7 +34,7 @@ class StreamBench
     public function benchFilterMap()
     {
         $iterator = $this->createIntIterator(1000);
-        $stream   = Streams::wrap($iterator);
+        $stream   = Pipeline::wrap($iterator);
         $result   = $stream
             ->filter(function(int $e) {
                 return $e % 2 == 0;
@@ -49,7 +49,7 @@ class StreamBench
     public function benchFilterMapPeek()
     {
         $iterator = $this->createIntIterator(1000);
-        $stream   = Streams::wrap($iterator);
+        $stream   = Pipeline::wrap($iterator);
         $peeks    = (object) ['count' => 0];
         $result   = $stream
             ->filter(function(int $e) {
@@ -68,12 +68,12 @@ class StreamBench
     public function benchFilterFlatMap()
     {
         $iterator = $this->createIntIterator(1000);
-        $stream   = Streams::wrap($iterator);
+        $stream   = Pipeline::wrap($iterator);
         $result   = $stream
             ->filter(function(int $e) {
                 return $e % 2 == 0;
-            })->flatMapToNumeric(function(int $e) {
-                return [$e, $e / 2];
+            })->flatMapToInt(function(int $e) {
+                return [$e, intval($e / 2)];
             })->map(function(int $e) {
                 return $e * $e;
             })
@@ -85,7 +85,7 @@ class StreamBench
     public function benchFlatMapDistinct()
     {
         $iterator = $this->createIntIterator(1000);
-        $stream   = Streams::wrap($iterator);
+        $stream   = Pipeline::wrap($iterator);
         $result   = $stream
             ->flatMap(function(int $e) {
                 return array_fill(0, 10, $e);

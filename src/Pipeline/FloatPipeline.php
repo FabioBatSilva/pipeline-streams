@@ -32,40 +32,40 @@ use Pipeline\Sink\FlatMapSink;
 use Pipeline\Sink\DistinctSink;
 
 /**
- * Implements a stream stage or stream source stage implementing whose elements are of any type.
+ * Implements a pipeline stage or pipeline source stage implementing whose elements are floats.
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-class Pipeline extends BaseStream implements MixedStream
+class FloatPipeline extends BaseStream implements FloatStream
 {
     /**
-     * Returns a Pipeline containing the parameters as elements
+     * Returns a FloatStream containing the parameters as elements
      *
-     * @param int $values,...
+     * @param float $values...
      *
-     * @return \Pipeline\Pipeline
+     * @return \Pipeline\FloatPipeline
      */
-    public static function of(...$values) : Pipeline
+    public static function of(float ...$values) : FloatPipeline
     {
         $iterator = new ArrayIterator($values);
-        $pipeline = new Pipeline($iterator);
+        $pipeline = new FloatPipeline($iterator);
 
         return $pipeline;
     }
 
     /**
-     * Wrap the input values in a Pipeline.
+     * Wrap the input values in a FloatStream.
      *
      * @param array|\Iterator $source
      *
-     * @return \Pipeline\Pipeline
+     * @return \Pipeline\FloatPipeline
      *
      * @throws \InvalidArgumentException if the $source arg is not valid.
      */
-    public static function wrap($source) : Pipeline
+    public static function wrap($source) : FloatPipeline
     {
         if ($source instanceof Iterator) {
-            return new Pipeline($source);
+            return new FloatPipeline($source);
         }
 
         if (is_array($source)) {
@@ -82,9 +82,25 @@ class Pipeline extends BaseStream implements MixedStream
     /**
      * {@inheritdoc}
      */
+    public function average() : float
+    {
+        return (float) $this->collect(Collectors::averagingNumbers());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function sum() : float
+    {
+        return (float) $this->collect(Collectors::summingNumbers());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function filter(callable $predicate) : Stream
     {
-        return $this->createMixedStream($this, function(Sink $sink) use ($predicate) {
+        return $this->createFloatStream($this, function(Sink $sink) use ($predicate) {
             return new FilterSink($sink, $predicate);
         });
     }
@@ -93,26 +109,6 @@ class Pipeline extends BaseStream implements MixedStream
      * {@inheritdoc}
      */
     public function map(callable $mapper) : Stream
-    {
-        return $this->createMixedStream($this, function(Sink $sink) use ($mapper) {
-            return new MapSink($sink, $mapper);
-        });
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function mapToInt(callable $mapper) : IntStream
-    {
-        return $this->createIntStream($this, function(Sink $sink) use ($mapper) {
-            return new MapSink($sink, $mapper);
-        });
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function mapToFloat(callable $mapper) : FloatStream
     {
         return $this->createFloatStream($this, function(Sink $sink) use ($mapper) {
             return new MapSink($sink, $mapper);
@@ -124,26 +120,6 @@ class Pipeline extends BaseStream implements MixedStream
      */
     public function flatMap(callable $mapper) : Stream
     {
-        return $this->createMixedStream($this, function(Sink $sink) use ($mapper) {
-            return new FlatMapSink($sink, $mapper);
-        });
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function flatMapToInt(callable $mapper) : IntStream
-    {
-        return $this->createIntStream($this, function(Sink $sink) use ($mapper) {
-            return new FlatMapSink($sink, $mapper);
-        });
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function flatMapToFloat(callable $mapper) : FloatStream
-    {
         return $this->createFloatStream($this, function(Sink $sink) use ($mapper) {
             return new FlatMapSink($sink, $mapper);
         });
@@ -154,7 +130,7 @@ class Pipeline extends BaseStream implements MixedStream
      */
     public function distinct() : Stream
     {
-        return $this->createMixedStream($this, function(Sink $sink) {
+        return $this->createFloatStream($this, function(Sink $sink) {
             return new DistinctSink($sink);
         });
     }
@@ -164,7 +140,7 @@ class Pipeline extends BaseStream implements MixedStream
      */
     public function sorted(callable $comparator = null) : Stream
     {
-        return $this->createMixedStream($this, function(Sink $sink) use ($comparator) {
+        return $this->createFloatStream($this, function(Sink $sink) use ($comparator) {
             return new SortSink($sink, $comparator);
         });
     }
@@ -174,7 +150,7 @@ class Pipeline extends BaseStream implements MixedStream
      */
     public function peek(callable $action) : Stream
     {
-        return $this->createMixedStream($this, function(Sink $sink) use ($action) {
+        return $this->createFloatStream($this, function(Sink $sink) use ($action) {
             return new InvokeSink($sink, $action);
         });
     }
@@ -184,7 +160,7 @@ class Pipeline extends BaseStream implements MixedStream
      */
     public function limit(int $maxSize) : Stream
     {
-        return $this->createMixedStream($this, function(Sink $sink) use ($maxSize) {
+        return $this->createFloatStream($this, function(Sink $sink) use ($maxSize) {
             return new SliceSink($sink, null, $maxSize);
         });
     }
@@ -194,7 +170,7 @@ class Pipeline extends BaseStream implements MixedStream
      */
     public function skip(int $skip) : Stream
     {
-        return $this->createMixedStream($this, function(Sink $sink) use ($skip) {
+        return $this->createFloatStream($this, function(Sink $sink) use ($skip) {
             return new SliceSink($sink, $skip, null);
         });
     }

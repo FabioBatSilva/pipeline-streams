@@ -3,7 +3,7 @@
 namespace PipelineTest;
 
 use ArrayObject;
-use Pipeline\Streams;
+use Pipeline\Pipeline;
 use Pipeline\Collectors;
 
 class StreamCollectTest extends TestCase
@@ -19,7 +19,7 @@ class StreamCollectTest extends TestCase
             ['key' => 'three', 'value' => '3 - 1']
         ];
 
-        $stream   = Streams::wrap($values);
+        $stream   = Pipeline::wrap($values);
         $result   = $stream->collect(Collectors::groupingBy(function (array $item){
             return $item['key'];
         }));
@@ -61,7 +61,7 @@ class StreamCollectTest extends TestCase
             return $item['key'];
         }, $mapValues);
 
-        $stream = Streams::wrap($values);
+        $stream = Pipeline::wrap($values);
         $result = $stream->collect($groupByKey, $mapValues);
 
         $this->assertArrayHasKey('one', $result);
@@ -95,7 +95,7 @@ class StreamCollectTest extends TestCase
             return implode(' - ', $item['value']);
         });
 
-        $stream = Streams::wrap($values);
+        $stream = Pipeline::wrap($values);
         $result = $stream->collect($collector);
 
         $this->assertCount(4, $result);
@@ -109,8 +109,8 @@ class StreamCollectTest extends TestCase
     public function testCollectJoining()
     {
         $values  = range(1, 5);
-        $stream1 = Streams::wrap($values);
-        $stream2 = Streams::wrap($values);
+        $stream1 = Pipeline::wrap($values);
+        $stream2 = Pipeline::wrap($values);
         $result1 = $stream1->collect(Collectors::joining());
         $result2 = $stream2->collect(Collectors::joining(' - '));
 

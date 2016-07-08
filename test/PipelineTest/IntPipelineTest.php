@@ -2,16 +2,19 @@
 
 namespace PipelineTest;
 
+use Iterator;
 use ArrayObject;
-use Pipeline\Pipeline;
-use Pipeline\Collector;
-use Pipeline\Collectors;
+use ArrayIterator;
 
-class PipelineTest extends TestCase
+use Pipeline\Stream;
+use Pipeline\Collector;
+use Pipeline\IntPipeline;
+
+class IntPipelineTest extends TestCase
 {
     public function testReducePipeline()
     {
-        $stream = Pipeline::of(2, 4, 8, 18, 32);
+        $stream = IntPipeline::of(2, 4, 8, 18, 32);
         $result = $stream->reduce(0, function(int $state, int $item) {
             return $state + $item;
         });
@@ -21,7 +24,7 @@ class PipelineTest extends TestCase
 
     public function testToArray()
     {
-        $stream = Pipeline::wrap(range(1, 10));
+        $stream = IntPipeline::wrap(range(1, 10));
         $result = $stream->filter(function(int $e) {
             return $e % 2 == 0;
         })
@@ -32,7 +35,7 @@ class PipelineTest extends TestCase
 
     public function testFlatMap()
     {
-        $stream = Pipeline::of(1, 2, 3);
+        $stream = IntPipeline::of(1, 2, 3);
         $result = $stream->flatMap(function(int $e) : array {
             return [$e * 1, $e * 2, $e * 3];
         })->toArray();
@@ -42,7 +45,7 @@ class PipelineTest extends TestCase
 
     public function testSorted()
     {
-        $stream = Pipeline::of(5, 4, 3, 2, 1);
+        $stream = IntPipeline::of(5, 4, 3, 2, 1);
         $result = $stream
             ->sorted()
             ->toArray();
@@ -52,7 +55,7 @@ class PipelineTest extends TestCase
 
     public function testSortedWithFunction()
     {
-        $stream = Pipeline::of(2, 3, 1);
+        $stream = IntPipeline::of(2, 3, 1);
         $result = $stream->sorted(function (int $a, int $b) {
             return $a <=> $b;
         })->toArray();
@@ -63,7 +66,7 @@ class PipelineTest extends TestCase
     public function testLimit()
     {
         $values = range(1, 10);
-        $stream = Pipeline::wrap($values);
+        $stream = IntPipeline::wrap($values);
         $result = $stream
             ->limit(5)
             ->toArray();
@@ -74,7 +77,7 @@ class PipelineTest extends TestCase
     public function testSkip()
     {
         $values = range(1, 10);
-        $stream = Pipeline::wrap($values);
+        $stream = IntPipeline::wrap($values);
         $result = $stream
             ->skip(5)
             ->toArray();
@@ -85,7 +88,7 @@ class PipelineTest extends TestCase
     public function testSlice()
     {
         $values = range(1, 10);
-        $stream = Pipeline::wrap($values);
+        $stream = IntPipeline::wrap($values);
         $result = $stream
             ->skip(4)
             ->limit(4)
@@ -96,7 +99,7 @@ class PipelineTest extends TestCase
 
     public function testMin()
     {
-        $stream = Pipeline::of(1, 5, 5, 3, 10);
+        $stream = IntPipeline::of(1, 5, 5, 3, 10);
         $result = $stream->min();
 
         $this->assertSame(1, $result);
@@ -104,7 +107,7 @@ class PipelineTest extends TestCase
 
     public function testMax()
     {
-        $stream = Pipeline::of(1, 7, 5, 5, 2);
+        $stream = IntPipeline::of(1, 7, 5, 5, 2);
         $result = $stream->max();
 
         $this->assertSame(7, $result);
@@ -113,7 +116,7 @@ class PipelineTest extends TestCase
     public function testCount()
     {
         $values = range(1, 10);
-        $stream = Pipeline::wrap($values);
+        $stream = IntPipeline::wrap($values);
         $result = $stream->count();
 
         $this->assertEquals(10, $result);
@@ -121,7 +124,7 @@ class PipelineTest extends TestCase
 
     public function testFindFirst()
     {
-        $stream = Pipeline::of(5, 4, 3, 2, 1);
+        $stream = IntPipeline::of(5, 4, 3, 2, 1);
         $result = $stream->findFirst();
 
         $this->assertEquals(5, $result);
@@ -129,7 +132,7 @@ class PipelineTest extends TestCase
 
     public function testFindFirstMatch()
     {
-        $stream = Pipeline::of(5, 4, 3, 2, 1);
+        $stream = IntPipeline::of(5, 4, 3, 2, 1);
         $result = $stream->findFirst(function(int $e) {
             return ($e < 5) && ($e % 2 != 0);
         });
@@ -140,8 +143,8 @@ class PipelineTest extends TestCase
     public function testAnyMatch()
     {
         $values  = [5, 4, 3, 2, 1];
-        $stream1 = Pipeline::wrap($values);
-        $stream2 = Pipeline::wrap($values);
+        $stream1 = IntPipeline::wrap($values);
+        $stream2 = IntPipeline::wrap($values);
 
         $this->assertTrue($stream1->anyMatch(function(int $e) {
             return $e === 3;
@@ -155,8 +158,8 @@ class PipelineTest extends TestCase
     public function testAllMatch()
     {
         $values  = [5, 4, 3, 2, 1];
-        $stream1 = Pipeline::wrap($values);
-        $stream2 = Pipeline::wrap($values);
+        $stream1 = IntPipeline::wrap($values);
+        $stream2 = IntPipeline::wrap($values);
 
         $this->assertTrue($stream1->allMatch(function(int $e) {
             return $e < 10;
@@ -170,8 +173,8 @@ class PipelineTest extends TestCase
     public function testNoneMatch()
     {
         $values  = [5, 4, 3, 2, 1];
-        $stream1 = Pipeline::wrap($values);
-        $stream2 = Pipeline::wrap($values);
+        $stream1 = IntPipeline::wrap($values);
+        $stream2 = IntPipeline::wrap($values);
 
         $this->assertTrue($stream1->noneMatch(function(int $e) {
             return $e > 10;
@@ -185,7 +188,7 @@ class PipelineTest extends TestCase
     public function testCollect()
     {
         $values    = [1, 2, 3];
-        $stream    = Pipeline::of(1, 2, 3);
+        $stream    = IntPipeline::of(1, 2, 3);
         $collector = $this->createMock(Collector::CLASS);
 
         $collector
@@ -213,7 +216,7 @@ class PipelineTest extends TestCase
     public function testDistinct()
     {
         $values = [1, 2, 2, 3, 4, 5, 5, 1];
-        $stream = Pipeline::wrap($values);
+        $stream = IntPipeline::wrap($values);
         $result = $stream->distinct()->toArray();
 
         $this->assertEquals([1, 2, 3, 4, 5], $result);
@@ -223,7 +226,7 @@ class PipelineTest extends TestCase
     {
         $peeks  = new ArrayObject();
         $values = [1, 2, 3, 4, 5];
-        $stream = Pipeline::wrap($values);
+        $stream = IntPipeline::wrap($values);
 
         $result = $stream
             ->peek(function(int $e) use ($peeks) {
@@ -244,7 +247,7 @@ class PipelineTest extends TestCase
     {
         $values = range(1, 10);
         $result = new ArrayObject();
-        $stream = Pipeline::wrap($values);
+        $stream = IntPipeline::wrap($values);
 
         $stream
             ->sorted()
@@ -266,120 +269,21 @@ class PipelineTest extends TestCase
         $this->assertEquals(8, $result[1]);
     }
 
-    public function testMapToInt()
-    {
-        $values = ['a', 'bb', 'ccc'];
-        $stream = Pipeline::wrap($values);
-        $result = $stream->mapToInt(function(string $e) {
-            return strlen($e);
-        })->sum();
-
-        $this->assertEquals(6, $result);
-    }
-
-    public function testMapToFloat()
-    {
-        $values = ['a', 'bb', 'ccc'];
-        $stream = Pipeline::wrap($values);
-        $result = $stream->mapToFloat(function(string $e) {
-            return strlen($e) * 1.5;
-        })->sum();
-
-        $this->assertSame(9.0, $result);
-    }
-
-    public function testFlatMapToInt()
-    {
-        $values = [['a', 'bb'], ['ccc', 'dddd']];
-        $stream = Pipeline::wrap($values);
-        $result = $stream->flatMapToInt(function(array $e) {
-            return array_map('strlen', $e);
-        })->average();
-
-        $this->assertEquals(2, $result);
-    }
-
-    public function testPeekMap()
-    {
-        $values   = ['one', 'two', 'three', 'five'];
-        $stream   = Pipeline::wrap($values);
-        $result   = new ArrayObject();
-        $mapping  = [
-            'ONE'   => 11,
-            'TWO'   => 22,
-            'THREE' => 33
-        ];
-
-        $sum = $stream
-            ->map(function(string $e) {
-                return strtoupper($e);
-            })
-            ->filter(function(string $e) use ($mapping) {
-                return isset($mapping[$e]);
-            })
-            ->mapToInt(function(string $e) use ($mapping) {
-                return $mapping[$e];
-            })
-            ->peek(function(int $e) use ($result) {
-                $result[] = $e;
-            })
-            ->filter(function(int $e) {
-                return ($e % 2 != 0);
-            })
-            ->sum();
-
-        $this->assertEquals(44, $sum);
-        $this->assertCount(3, $result);
-        $this->assertEquals([11, 22, 33], $result->getArrayCopy());
-    }
-
-    public function testCountWorks()
-    {
-        $readFileLines = function ($file) : \Iterator {
-            $file = new \SplFileObject($file);
-
-            while ( ! $file->eof()) {
-                yield $file->fgets();
-            }
-        };
-
-        $file   = __DIR__ . '/../../LICENSE';
-        $lines  = $readFileLines($file);
-        $result = Pipeline::wrap($lines)
-            ->filter(function(string $line) {
-                return strlen($line) > 1;
-            })
-            ->map(function(string $line) {
-                return trim(strtolower($line));
-            })
-            ->flatMap(function(string $line) {
-                return explode(' ', $line);
-            })
-            ->collect(Collectors::groupingBy(function (string $word) {
-                return $word;
-            }, Collectors::counting()));
-
-        $this->assertCount(100, $result);
-        $this->assertEquals(13, $result['the']);
-        $this->assertEquals(3, $result['copyright']);
-        $this->assertEquals(2, $result['permission']);
-    }
-
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Argument 1 passed to Pipeline\Pipeline::wrap($source) must be an instance of array|\Iterator, stdClass given.
+     * @expectedExceptionMessage Argument 1 passed to Pipeline\IntPipeline::wrap($source) must be an instance of array|\Iterator, stdClass given.
      */
     public function testWrapInvalidObjectArgumentException()
     {
-        Pipeline::wrap(new \stdClass);
+        IntPipeline::wrap(new \stdClass);
     }
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Argument 1 passed to Pipeline\Pipeline::wrap($source) must be an instance of array|\Iterator, NULL given.
+     * @expectedExceptionMessage Argument 1 passed to Pipeline\IntPipeline::wrap($source) must be an instance of array|\Iterator, NULL given.
      */
     public function testWrapInvalidNullArgumentException()
     {
-        Pipeline::wrap(null);
+        IntPipeline::wrap(null);
     }
 }

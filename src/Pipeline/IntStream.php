@@ -21,23 +21,23 @@ declare(strict_types=1);
 namespace Pipeline;
 
 /**
- * A sequence of numeric elements supporting aggregate operations.
+ * A sequence of int elements supporting aggregate operations.
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-interface NumericStream extends Stream
+interface IntStream extends Stream
 {
     /**
-     * Returns an number describing the arithmetic mean of elements of this stream.
+     * Returns an int describing the arithmetic mean of elements of this stream.
      *
-     * @return int|float
+     * @return int
      */
-    public function average();
+    public function average() : int;
 
     /**
      * Returns the sum of elements in this stream.
      *
-     * @return int|float
+     * @return int
      */
-    public function sum();
+    public function sum() : int;
 }

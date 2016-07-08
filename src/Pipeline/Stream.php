@@ -81,7 +81,7 @@ interface Stream
      *
      * <code>
      * <?php
-     *     Streams::of("one", "two", "three", "four")
+     *     Pipeline::of("one", "two", "three", "four")
      *         ->filter(function ($e) { strlen($e) > 3})
      *         ->peek(function ($e) { echo "Filtered value: $e"})
      *         ->map('strtoupper')
@@ -122,7 +122,7 @@ interface Stream
      *
      * <code>
      * <?php
-     *  Streams::of("one", "two", "three", "four")
+     *  Pipeline::of("one", "two", "three", "four")
      *      ->forEach(function (string $e) {
      *          file_put_contents('file.log', $e, FILE_APPEND | LOCK_EX);
      *      });
@@ -146,10 +146,10 @@ interface Stream
      *
      * <code>
      * <?php
-     *  $sum = Streams::wrap(range(0, 100))
-     *      ->reduce(function (int $identity, int $item) {
-     *          return $identity + $item;
-     *      }, 0);
+     *  $sum = Pipeline::wrap(range(0, 100))
+     *      ->reduce(0, function (int $state, int $item) {
+     *          return $state + $item;
+     *      });
      * </code>
      *
      * @param mixed    $state       The initial state value

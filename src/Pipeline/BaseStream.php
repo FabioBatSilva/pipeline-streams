@@ -295,16 +295,47 @@ abstract class BaseStream implements Stream
     }
 
     /**
-     * Create a new numeric stream
+     * Create a new float stream
      *
      * @param BaseStream $sourceStage
      * @param callable   $opWrapSink
      *
-     * @return \Pipeline\NumericStream
+     * @return \Pipeline\FloatStream
      */
-    protected function createNumericStream(BaseStream $sourceStage, callable $opWrapSink) : NumericStream
+    protected function createFloatStream(BaseStream $sourceStage, callable $opWrapSink) : FloatStream
     {
-        return new class($sourceStage, $opWrapSink) extends NumericPipeline
+        return new class($sourceStage, $opWrapSink) extends FloatPipeline
+        {
+            private $callable;
+
+            public function __construct($self, $callable)
+            {
+                $this->sourceStage   = $self->sourceStage;
+                $this->callable      = $callable;
+                $this->previousStage = $self;
+            }
+
+            protected function opWrapSink(Sink $sink) : Sink
+            {
+                $callable = $this->callable;
+                $wrap     = $callable($sink);
+
+                return $wrap;
+            }
+        };
+    }
+
+    /**
+     * Create a new int stream
+     *
+     * @param BaseStream $sourceStage
+     * @param callable   $opWrapSink
+     *
+     * @return \Pipeline\IntPipeline
+     */
+    protected function createIntStream(BaseStream $sourceStage, callable $opWrapSink) : IntStream
+    {
+        return new class($sourceStage, $opWrapSink) extends IntPipeline
         {
             private $callable;
 

@@ -19,23 +19,22 @@ composer require pipeline-streams/pipeline-streams
 
 This library provides Utility methods for creating streams.
 
-``\Pipeline\Streams`` takes a ``Iterator`` or ``array`` as input source :
+``\Pipeline\Pipeline`` takes a ``Iterator`` or ``array`` as input source :
 
 
 ```php
 <?php
 
-use Pipeline\Streams;
+use Pipeline\Pipeline;
 
 // Create stream from list of values
-$stream1 = Streams::of(1, 2, 3, 4, 5);
+$stream1 = Pipeline::of(1, 2, 3, 4, 5);
 
 // Create stream from array
-$stream2 = Streams::wrap([1, 2, 3, 4, 5]);
+$stream2 = Pipeline::wrap([1, 2, 3, 4, 5]);
 
 // Create stream from Iterator
-$stream3 = Streams::wrap(new ArrayIterator([1, 2, 3, 4, 5]));
-
+$stream3 = Pipeline::wrap(new ArrayIterator([1, 2, 3, 4, 5]));
 ```
 
 
@@ -48,7 +47,7 @@ The following code segment shows how to print 10 numbers using ``forEach`` :
 ```php
 <?php
 
-Streams::wrap(range(1, 10))
+Pipeline::wrap(range(1, 10))
     ->forEach(function(int $e) {
         var_dump($e);
     });
@@ -64,7 +63,7 @@ The following code segment prints unique squares of numbers using ``map`` :
 ```php
 <?php
 
-Streams::of(3, 2, 2, 3, 7, 3, 5)
+Pipeline::of(3, 2, 2, 3, 7, 3, 5)
     ->map(function(int $i) {
         return $i * $i;
     }
@@ -72,7 +71,6 @@ Streams::of(3, 2, 2, 3, 7, 3, 5)
     ->forEach(function(int $i) {
         var_dump($i);
     });
-
 ```
 
 
@@ -86,14 +84,13 @@ The following code segment prints a count of empty strings using ``filter`` :
 <?php
 
 // Get count of empty string
-$count = Streams::of("abc", "", "bc", "efg", "abcd","", "jkl")
+$count = Pipeline::of("abc", "", "bc", "efg", "abcd","", "jkl")
     ->filter(function(string $str) {
-        return ! empty($str);
+        return empty($str);
     }
     ->count();
 
 var_dump($count);
-
 ```
 
 
@@ -106,12 +103,11 @@ The following code segment shows how to print 10 numbers using ``limit`` :
 ```php
 <?php
 
-Streams::wrap(range(0, 30))
+Pipeline::wrap(range(0, 30))
     ->limit(10)
     ->forEach(function(int $e) {
         var_dump($e);
     });
-
 ```
 
 
@@ -128,13 +124,12 @@ $numbers = range(1, 20);
 
 shuffle($numbers);
 
-Streams::wrap($numbers)
+Pipeline::wrap($numbers)
     ->sorted()
     ->limit(10)
     ->forEach(function(int $e) {
         var_dump($e);
     });
-
 ```
 
 
@@ -177,10 +172,10 @@ The following code segment shows how to get People's whose names begin with the 
 
 ```php
 <?php
-use Pipeline\Streams;
+use Pipeline\Pipeline;
 use Pipeline\Collectors;
 
-$filtered = Streams::wrap($persons)
+$filtered = Pipeline::wrap($persons)
     ->filter(function(Person $p) {
         return $p->name[0] === 'P';
     })
@@ -193,7 +188,7 @@ You can also use the helper method ``Stream#toArray``
 
 ```php
 <?php
-$filtered = Streams::wrap($persons)
+$filtered = Pipeline::wrap($persons)
     ->filter(function(Person $p) {
         return $p->name[0] === 'P';
     })
@@ -209,17 +204,17 @@ The next example groups all persons by age :
 ```php
 <?php
 
-$personsByAge = Streams::wrap($persons)
+$personsByAge = Pipeline::wrap($persons)
     ->collect(Collectors::groupingBy(function (Person $p) {
         return $p->age;
     }));
 
 /*
-[
+{
     23 : [ Person("Peter", 23), Person("Pamela", 23) ],
     18 : [ Person("Max", 18) ],
     12 : [ Person("David", 12) ]
-]
+}
 */
 ```
 
@@ -229,7 +224,7 @@ The next example joins all persons into a single string :
 ```php
 <?php
 
-$phrase = Streams::wrap($persons)
+$phrase = Pipeline::wrap($persons)
     ->filter(function(Person $p) {
         return $p->age >= 18;
     })
@@ -260,7 +255,7 @@ function readFileLines(string $file) : Iterator
 }
 
 $lines  = $this->readFileLines('./LICENSE');
-$result = Streams::wrap($lines)
+$result = Pipeline::wrap($lines)
     ->filter(function(string $line) {
         return strlen($line) > 1;
     })
