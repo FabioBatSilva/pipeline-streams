@@ -22,7 +22,7 @@ This library provides Utility methods for creating streams.
 All ``\Pipeline\Stream`` implementations take a ``Traversable`` or ``array`` as source argument :
 
 
-###### ``\Pipeline\Pipeline`` :
+###### Stream :
 ```php
 <?php
 
@@ -42,7 +42,7 @@ $stream2 = Pipeline::wrap([
 $stream3 = Pipeline::wrap(new ArrayIterator([$values]));
 ```
 
-###### ``\Pipeline\IntPipeline`` :
+###### IntStream :
 ```php
 <?php
 
@@ -58,7 +58,7 @@ $stream2 = IntPipeline::wrap(1, 2, 3);
 $stream3 = IntPipeline::wrap(new ArrayIterator([1, 2, 3]));
 ```
 
-###### ``\Pipeline\FloatPipeline`` :
+###### FloatStream :
 ```php
 <?php
 
