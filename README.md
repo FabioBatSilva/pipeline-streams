@@ -111,7 +111,7 @@ Pipeline::of(3, 2, 2, 3, 7, 3, 5)
 ```
 
 
-### map
+### flatMap
 
 The ``flatMap`` method is used to map each element into a list of elements and collect a single result.
 
@@ -314,7 +314,7 @@ Following code snippet shows how you can write a word count program using the St
 ```php
 <?php
 
-function readFileLines(string $file) : Iterator
+public function readFileLines(string $file) : Iterator
 {
     $file = new \SplFileObject($file);
 
