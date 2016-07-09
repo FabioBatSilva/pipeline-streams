@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace Pipeline;
 
-use Iterator;
+use Traversable;
 use ArrayIterator;
 
 use Pipeline\Sink\MapSink;
@@ -56,7 +56,7 @@ class Pipeline extends BaseStream implements MixedStream
     /**
      * Wrap the input values in a Pipeline.
      *
-     * @param array|\Iterator $source
+     * @param array|\Traversable $source
      *
      * @return \Pipeline\Pipeline
      *
@@ -64,7 +64,7 @@ class Pipeline extends BaseStream implements MixedStream
      */
     public static function wrap($source) : Pipeline
     {
-        if ($source instanceof Iterator) {
+        if ($source instanceof Traversable) {
             return new Pipeline($source);
         }
 
@@ -73,7 +73,7 @@ class Pipeline extends BaseStream implements MixedStream
         }
 
         throw new \InvalidArgumentException(sprintf(
-            'Argument 1 passed to %s($source) must be an instance of array|\Iterator, %s given.',
+            'Argument 1 passed to %s($source) must be an instance of array|\Traversable, %s given.',
             __METHOD__,
             is_object($source) ? get_class($source) : gettype($source)
         ));

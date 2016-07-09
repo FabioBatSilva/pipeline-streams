@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace Pipeline;
 
-use Iterator;
+use Traversable;
 
 /**
  * An operation in a stream pipeline that takes a stream as input and produces a result or side-effect.
@@ -34,9 +34,9 @@ interface TerminalOp
      * Pipeline, which describes the upstream intermediate operations.
      *
      * @param \Pipeline\BaseStream $pipeline The pipeline
-     * @param \Iterator            $iterator The source iterator
+     * @param \Traversable            $iterator The source iterator
      *
      * @return the result of the evaluation
      */
-    public function evaluate(BaseStream $pipeline, Iterator $iterator);
+    public function evaluate(BaseStream $pipeline, Traversable $iterator);
 }

@@ -20,7 +20,7 @@ declare(strict_types=1);
 
 namespace Pipeline;
 
-use Iterator;
+use Traversable;
 use RuntimeException;
 
 use Pipeline\Sink;
@@ -54,16 +54,16 @@ abstract class BaseStream implements Stream
     /**
      * The source spliterator. Only valid for the head pipeline.
      *
-     * @var \Iterator
+     * @var \Traversable
      */
     protected $source;
 
     /**
      * Construct
      *
-     * @param \Iterator $source
+     * @param \Traversable $source
      */
-    public function __construct(Iterator $source)
+    public function __construct(Traversable $source)
     {
         $this->source      = $source;
         $this->sourceStage = $this;
@@ -167,12 +167,12 @@ abstract class BaseStream implements Stream
 
     /**
      * Applies the pipeline stages described by this Pipeline to
-     * the provided Iterator and send the results to the provided Sink
+     * the provided Traversable and send the results to the provided Sink
      *
      * @param \Pipeline\Sink $sink
-     * @param \Iterator      $iterator
+     * @param \Traversable      $iterator
      */
-    public function wrapAndCopyInto(Sink $sink, Iterator $iterator) : Sink
+    public function wrapAndCopyInto(Sink $sink, Traversable $iterator) : Sink
     {
         $this->copyInto($this->wrapSink($sink), $iterator);
 
@@ -180,12 +180,12 @@ abstract class BaseStream implements Stream
     }
 
     /**
-     * Pushes elements obtained from the Iterator into the provided Sink
+     * Pushes elements obtained from the Traversable into the provided Sink
      *
      * @param \Pipeline\Sink $sink
-     * @param \Iterator      $iterator
+     * @param \Traversable      $iterator
      */
-    public function copyInto(Sink $sink, Iterator $iterator)
+    public function copyInto(Sink $sink, Traversable $iterator)
     {
         $sink->begin();
 
@@ -231,7 +231,7 @@ abstract class BaseStream implements Stream
      */
     public function evaluate(TerminalOp $terminalOp)
     {
-        $iterator = $this->sourceIterator();
+        $iterator = $this->sourceTraversable();
         $result   = $terminalOp->evaluate($this, $iterator);
 
         return $result;
@@ -241,9 +241,9 @@ abstract class BaseStream implements Stream
      * Gets the source stage spliterator if this pipeline stage is the source stage.
      * The pipeline is consumed after this method is called and returns successfully.
      *
-     * @return \Iterator
+     * @return \Traversable
      */
-    protected function sourceIterator() : Iterator
+    protected function sourceTraversable() : Traversable
     {
         return $this->sourceStage->source;
     }

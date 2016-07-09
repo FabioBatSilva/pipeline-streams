@@ -19,22 +19,59 @@ composer require pipeline-streams/pipeline-streams
 
 This library provides Utility methods for creating streams.
 
-``\Pipeline\Pipeline`` takes a ``Iterator`` or ``array`` as input source :
+All ``\Pipeline\Stream`` implementations take a ``Traversable`` or ``array`` as source argument :
 
 
+###### ``\Pipeline\Pipeline`` :
 ```php
 <?php
 
 use Pipeline\Pipeline;
 
 // Create stream from list of values
-$stream1 = Pipeline::of(1, 2, 3, 4, 5);
+$stream1 = Pipeline::of('one', 'two', 'three');
 
 // Create stream from array
-$stream2 = Pipeline::wrap([1, 2, 3, 4, 5]);
+$stream2 = Pipeline::wrap([
+    new Person("Max", 18),
+    new Person("Peter", 23),
+    new Person("Pamela", 23)
+]);
 
 // Create stream from Iterator
-$stream3 = Pipeline::wrap(new ArrayIterator([1, 2, 3, 4, 5]));
+$stream3 = Pipeline::wrap(new ArrayIterator([$values]));
+```
+
+###### ``\Pipeline\IntPipeline`` :
+```php
+<?php
+
+use Pipeline\IntPipeline;
+
+// Create stream from list of values
+$stream1 = IntPipeline::of(1, 2, 3);
+
+// Create stream from array
+$stream2 = IntPipeline::wrap(1, 2, 3);
+
+// Create stream from Iterator
+$stream3 = IntPipeline::wrap(new ArrayIterator([1, 2, 3]));
+```
+
+###### ``\Pipeline\FloatPipeline`` :
+```php
+<?php
+
+use Pipeline\FloatPipeline;
+
+// Create stream from list of values
+$stream1 = FloatPipeline::of(1.1, 2.2, 3.3);
+
+// Create stream from array
+$stream2 = FloatPipeline::wrap(1.1, 2.2, 3.3);
+
+// Create stream from Iterator
+$stream3 = FloatPipeline::wrap(new ArrayIterator([1.1, 2.2, 3.3]));
 ```
 
 
@@ -71,6 +108,38 @@ Pipeline::of(3, 2, 2, 3, 7, 3, 5)
     ->forEach(function(int $i) {
         var_dump($i);
     });
+```
+
+
+### map
+
+The ``flatMap`` method is used to map each element into a list of elements and collect a single result.
+
+In above example, we convert a array of ``BlogPost`` to a flat array of tags. using ``flatMap`` :
+
+```php
+<?php
+
+class BlogPost
+{
+    public $id;
+    public $tags = [];
+    // ...
+}
+
+$posts = [
+    new BlogPost(1, ['php', 'pipeline']),
+    new BlogPost(2, ['collections']),
+    new BlogPost(3, ['stream', 'list'])
+];
+
+$result = Pipeline::wrap($posts)
+    ->flatMap(function(BlogPost $p) : array {
+        return $p->tags;
+    }
+    ->toArray();
+
+// ['php', 'pipeline', 'collections', 'stream', 'list']
 ```
 
 

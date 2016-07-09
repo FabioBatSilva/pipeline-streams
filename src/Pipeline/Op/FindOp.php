@@ -20,8 +20,6 @@ declare(strict_types=1);
 
 namespace Pipeline\Op;
 
-use Iterator;
-
 /**
  * An operation that searches for an element in a stream pipeline, and terminates when it finds one.
  *

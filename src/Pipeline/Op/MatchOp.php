@@ -20,8 +20,6 @@ declare(strict_types=1);
 
 namespace Pipeline\Op;
 
-use Iterator;
-
 /**
  * An operation that evaluates a predicate on the
  * elements of a stream and determines whether all, any or none of those

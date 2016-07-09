@@ -20,7 +20,8 @@ declare(strict_types=1);
 
 namespace Pipeline\Op;
 
-use Iterator;
+use Traversable;
+
 use Pipeline\BaseStream;
 use Pipeline\TerminalOp;
 use Pipeline\TerminalSink;
@@ -35,7 +36,7 @@ abstract class BaseTerminalOp implements TerminalOp, TerminalSink
     /**
      * {@inheritdoc}
      */
-    public function evaluate(BaseStream $pipeline, Iterator $iterator)
+    public function evaluate(BaseStream $pipeline, Traversable $iterator)
     {
         return $pipeline->wrapAndCopyInto($this, $iterator)->get();
     }

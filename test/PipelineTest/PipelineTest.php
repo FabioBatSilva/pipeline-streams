@@ -349,7 +349,7 @@ class PipelineTest extends TestCase
 
     public function testCountWorks()
     {
-        $readFileLines = function ($file) : \Iterator {
+        $readFileLines = function ($file) : \Traversable {
             $file = new \SplFileObject($file);
 
             while ( ! $file->eof()) {
@@ -379,7 +379,7 @@ class PipelineTest extends TestCase
         $this->assertEquals(2, $result['permission']);
     }
 
-    public function testWrapIterator()
+    public function testWrapTraversable()
     {
         $pipeline = Pipeline::wrap(new \ArrayIterator([1, 2, 3]));
         $result   = $pipeline->toArray();
@@ -389,7 +389,7 @@ class PipelineTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Argument 1 passed to Pipeline\Pipeline::wrap($source) must be an instance of array|\Iterator, stdClass given.
+     * @expectedExceptionMessage Argument 1 passed to Pipeline\Pipeline::wrap($source) must be an instance of array|\Traversable, stdClass given.
      */
     public function testWrapInvalidObjectArgumentException()
     {
@@ -398,7 +398,7 @@ class PipelineTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Argument 1 passed to Pipeline\Pipeline::wrap($source) must be an instance of array|\Iterator, NULL given.
+     * @expectedExceptionMessage Argument 1 passed to Pipeline\Pipeline::wrap($source) must be an instance of array|\Traversable, NULL given.
      */
     public function testWrapInvalidNullArgumentException()
     {

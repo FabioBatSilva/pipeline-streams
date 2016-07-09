@@ -2,7 +2,7 @@
 
 namespace PipelineTest;
 
-use Iterator;
+use Traversable;
 use ArrayObject;
 use ArrayIterator;
 
@@ -278,7 +278,7 @@ class IntPipelineTest extends TestCase
         $this->assertEquals(2, $result);
     }
 
-    public function testWrapIterator()
+    public function testWrapTraversable()
     {
         $pipeline = IntPipeline::wrap(new \ArrayIterator([1, 2, 3]));
         $result   = $pipeline->toArray();
@@ -288,7 +288,7 @@ class IntPipelineTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Argument 1 passed to Pipeline\IntPipeline::wrap($source) must be an instance of array|\Iterator, stdClass given.
+     * @expectedExceptionMessage Argument 1 passed to Pipeline\IntPipeline::wrap($source) must be an instance of array|\Traversable, stdClass given.
      */
     public function testWrapInvalidObjectArgumentException()
     {
@@ -297,7 +297,7 @@ class IntPipelineTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Argument 1 passed to Pipeline\IntPipeline::wrap($source) must be an instance of array|\Iterator, NULL given.
+     * @expectedExceptionMessage Argument 1 passed to Pipeline\IntPipeline::wrap($source) must be an instance of array|\Traversable, NULL given.
      */
     public function testWrapInvalidNullArgumentException()
     {

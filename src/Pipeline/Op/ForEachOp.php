@@ -20,8 +20,6 @@ declare(strict_types=1);
 
 namespace Pipeline\Op;
 
-use Iterator;
-
 /**
  * An operation in a stream pipeline that takes a stream as input and produces a result or side-effect.
  *
