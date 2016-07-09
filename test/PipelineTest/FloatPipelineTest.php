@@ -218,7 +218,7 @@ class FloatPipelineTest extends TestCase
         $stream = FloatPipeline::wrap($values);
         $result = $stream->distinct()->toArray();
 
-        $this->assertEquals([1.0, 2.0, 3.0, 4.0, 5.0], $result);
+        $this->assertSame([1.0, 2.0, 3.0, 4.0, 5.0], $result);
     }
 
     public function testPeek()
@@ -238,8 +238,8 @@ class FloatPipelineTest extends TestCase
 
         $this->assertCount(5, $peeks);
         $this->assertCount(3, $result);
-        $this->assertEquals([1.0, 3.0, 5.0], $result);
-        $this->assertEquals([1.0, 2.0, 3.0, 4.0, 5.0], $peeks->getArrayCopy());
+        $this->assertSame([1.0, 3.0, 5.0], $result);
+        $this->assertSame([1.0, 2.0, 3.0, 4.0, 5.0], $peeks->getArrayCopy());
     }
 
     public function testForEach()
@@ -264,8 +264,25 @@ class FloatPipelineTest extends TestCase
             });
 
         $this->assertCount(2, $result);
-        $this->assertEquals(4.0, $result[0]);
-        $this->assertEquals(8.0, $result[1]);
+        $this->assertSame(4.0, $result[0]);
+        $this->assertSame(8.0, $result[1]);
+    }
+
+    public function testAverage()
+    {
+        $values = [1.0, 1.0, 2.0, 3.0, 4.0, 4.0];
+        $stream = FloatPipeline::wrap($values);
+        $result = $stream->average();
+
+        $this->assertEquals(2.5, $result);
+    }
+
+    public function testWrapIterator()
+    {
+        $pipeline = FloatPipeline::wrap(new \ArrayIterator([1.0, 2.0, 3.0]));
+        $result   = $pipeline->toArray();
+
+        $this->assertSame([1.0, 2.0, 3.0], $result);
     }
 
     /**

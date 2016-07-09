@@ -299,6 +299,20 @@ class PipelineTest extends TestCase
         $this->assertEquals(2, $result);
     }
 
+    public function testFlatMapToFloat()
+    {
+        $stream   = Pipeline::wrap(['one', 'two', 'three']);
+        $result = $stream->flatMapToFloat(function(string $e) : array {
+            $length = strlen($e);
+            $value1 = $length * 1.5;
+            $value2 = $length * 2.5;
+
+            return [$value1, $value2];
+        })->toArray();
+
+        $this->assertSame([4.5, 7.5, 4.5, 7.5, 7.5, 12.5], $result);
+    }
+
     public function testPeekMap()
     {
         $values   = ['one', 'two', 'three', 'five'];
@@ -363,6 +377,14 @@ class PipelineTest extends TestCase
         $this->assertEquals(13, $result['the']);
         $this->assertEquals(3, $result['copyright']);
         $this->assertEquals(2, $result['permission']);
+    }
+
+    public function testWrapIterator()
+    {
+        $pipeline = Pipeline::wrap(new \ArrayIterator([1, 2, 3]));
+        $result   = $pipeline->toArray();
+
+        $this->assertSame([1, 2, 3], $result);
     }
 
     /**

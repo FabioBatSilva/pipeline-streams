@@ -269,6 +269,23 @@ class IntPipelineTest extends TestCase
         $this->assertEquals(8, $result[1]);
     }
 
+    public function testAverage()
+    {
+        $values = [1, 1, 2, 3, 4, 4];
+        $stream = IntPipeline::wrap($values);
+        $result = $stream->average();
+
+        $this->assertEquals(2, $result);
+    }
+
+    public function testWrapIterator()
+    {
+        $pipeline = IntPipeline::wrap(new \ArrayIterator([1, 2, 3]));
+        $result   = $pipeline->toArray();
+
+        $this->assertSame([1, 2, 3], $result);
+    }
+
     /**
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Argument 1 passed to Pipeline\IntPipeline::wrap($source) must be an instance of array|\Iterator, stdClass given.
