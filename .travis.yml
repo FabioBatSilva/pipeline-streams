@@ -7,7 +7,11 @@ cache:
     - $HOME/.composer/cache
 
 php:
-    - 7
+    - 7.0
+    - nightly
+
+allow_failures:
+    - php: nightly
 
 before_install:
     - composer self-update

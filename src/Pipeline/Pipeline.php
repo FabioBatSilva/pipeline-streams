@@ -84,7 +84,7 @@ class Pipeline extends BaseStream implements MixedStream
      */
     public function filter(callable $predicate) : Stream
     {
-        return $this->createMixedStream($this, function(Sink $sink) use ($predicate) {
+        return new PipelineStage($this, function(Sink $sink) use ($predicate) {
             return new FilterSink($sink, $predicate);
         });
     }
@@ -94,7 +94,7 @@ class Pipeline extends BaseStream implements MixedStream
      */
     public function map(callable $mapper) : Stream
     {
-        return $this->createMixedStream($this, function(Sink $sink) use ($mapper) {
+        return new PipelineStage($this, function(Sink $sink) use ($mapper) {
             return new MapSink($sink, $mapper);
         });
     }
@@ -104,7 +104,7 @@ class Pipeline extends BaseStream implements MixedStream
      */
     public function mapToInt(callable $mapper) : IntStream
     {
-        return $this->createIntStream($this, function(Sink $sink) use ($mapper) {
+        return new IntPipelineStage($this, function(Sink $sink) use ($mapper) {
             return new MapSink($sink, $mapper);
         });
     }
@@ -114,7 +114,7 @@ class Pipeline extends BaseStream implements MixedStream
      */
     public function mapToFloat(callable $mapper) : FloatStream
     {
-        return $this->createFloatStream($this, function(Sink $sink) use ($mapper) {
+        return new FloatPipelineStage($this, function(Sink $sink) use ($mapper) {
             return new MapSink($sink, $mapper);
         });
     }
@@ -124,7 +124,7 @@ class Pipeline extends BaseStream implements MixedStream
      */
     public function flatMap(callable $mapper) : Stream
     {
-        return $this->createMixedStream($this, function(Sink $sink) use ($mapper) {
+        return new PipelineStage($this, function(Sink $sink) use ($mapper) {
             return new FlatMapSink($sink, $mapper);
         });
     }
@@ -134,7 +134,7 @@ class Pipeline extends BaseStream implements MixedStream
      */
     public function flatMapToInt(callable $mapper) : IntStream
     {
-        return $this->createIntStream($this, function(Sink $sink) use ($mapper) {
+        return new IntPipelineStage($this, function(Sink $sink) use ($mapper) {
             return new FlatMapSink($sink, $mapper);
         });
     }
@@ -144,7 +144,7 @@ class Pipeline extends BaseStream implements MixedStream
      */
     public function flatMapToFloat(callable $mapper) : FloatStream
     {
-        return $this->createFloatStream($this, function(Sink $sink) use ($mapper) {
+        return new FloatPipelineStage($this, function(Sink $sink) use ($mapper) {
             return new FlatMapSink($sink, $mapper);
         });
     }
@@ -154,7 +154,7 @@ class Pipeline extends BaseStream implements MixedStream
      */
     public function distinct() : Stream
     {
-        return $this->createMixedStream($this, function(Sink $sink) {
+        return new PipelineStage($this, function(Sink $sink) {
             return new DistinctSink($sink);
         });
     }
@@ -164,7 +164,7 @@ class Pipeline extends BaseStream implements MixedStream
      */
     public function sorted(callable $comparator = null) : Stream
     {
-        return $this->createMixedStream($this, function(Sink $sink) use ($comparator) {
+        return new PipelineStage($this, function(Sink $sink) use ($comparator) {
             return new SortSink($sink, $comparator);
         });
     }
@@ -174,7 +174,7 @@ class Pipeline extends BaseStream implements MixedStream
      */
     public function peek(callable $action) : Stream
     {
-        return $this->createMixedStream($this, function(Sink $sink) use ($action) {
+        return new PipelineStage($this, function(Sink $sink) use ($action) {
             return new InvokeSink($sink, $action);
         });
     }
@@ -184,7 +184,7 @@ class Pipeline extends BaseStream implements MixedStream
      */
     public function limit(int $maxSize) : Stream
     {
-        return $this->createMixedStream($this, function(Sink $sink) use ($maxSize) {
+        return new PipelineStage($this, function(Sink $sink) use ($maxSize) {
             return new SliceSink($sink, null, $maxSize);
         });
     }
@@ -194,7 +194,7 @@ class Pipeline extends BaseStream implements MixedStream
      */
     public function skip(int $skip) : Stream
     {
-        return $this->createMixedStream($this, function(Sink $sink) use ($skip) {
+        return new PipelineStage($this, function(Sink $sink) use ($skip) {
             return new SliceSink($sink, $skip, null);
         });
     }

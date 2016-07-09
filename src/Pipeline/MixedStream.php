@@ -25,7 +25,7 @@ namespace Pipeline;
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-interface MixedStream extends Stream
+interface MixedStream extends Stream, ToIntStream, ToFloatStream
 {
     /**
      * Returns an IntStream consisting of the results of applying the

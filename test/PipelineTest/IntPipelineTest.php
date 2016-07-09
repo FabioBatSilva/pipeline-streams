@@ -12,6 +12,47 @@ use Pipeline\IntPipeline;
 
 class IntPipelineTest extends TestCase
 {
+    public function testFluentInterface()
+    {
+        $stream = IntPipeline::wrap([]);
+
+        $this->assertInstanceOf('Pipeline\IntPipeline', $stream->sorted());
+        $this->assertInstanceOf('Pipeline\IntPipeline', $stream->skip(10));
+        $this->assertInstanceOf('Pipeline\IntPipeline', $stream->distinct());
+        $this->assertInstanceOf('Pipeline\IntPipeline', $stream->map('floatval'));
+        $this->assertInstanceOf('Pipeline\IntPipeline', $stream->peek('var_dump'));
+        $this->assertInstanceOf('Pipeline\IntPipeline', $stream->filter('is_float'));
+        $this->assertInstanceOf('Pipeline\IntPipeline', $stream->flatMap(function(float $f){
+            return [$f];
+        }));
+
+        $this->assertInstanceOf('Pipeline\FloatPipeline', $stream->mapToFloat('floatval'));
+        $this->assertInstanceOf('Pipeline\FloatPipeline', $stream->flatMapToFloat(function(float $f){
+            return [floatval($f)];
+        }));
+    }
+
+    public function testMap()
+    {
+        $stream = IntPipeline::of(1, 2, 3);
+        $result = $stream->map(function(int $e) : int {
+            return $e * $e;
+        })->toArray();
+
+        $this->assertSame([1, 4, 9], $result);
+    }
+
+    public function testMapToFloat()
+    {
+        $intStream   = IntPipeline::of(1, 2, 3);
+        $floatStream = $intStream->mapToFloat(function(int $e) : float {
+            return ($e * $e) / 0.5;
+        });
+
+        $this->assertInstanceOf('Pipeline\FloatStream', $floatStream);
+        $this->assertSame(28.0, $floatStream->sum());
+    }
+
     public function testReducePipeline()
     {
         $stream = IntPipeline::of(2, 4, 8, 18, 32);
@@ -41,6 +82,17 @@ class IntPipelineTest extends TestCase
         })->toArray();
 
         $this->assertSame([1, 2, 3, 2, 4, 6, 3, 6, 9], $result);
+    }
+
+    public function testFlatMapToInt()
+    {
+        $intStream   = IntPipeline::of(1, 2, 3);
+        $floatStream = $intStream->flatMapToFLoat(function(int $e) : array {
+            return [floatval($e * 1), floatval($e * 2)];
+        });
+
+        $this->assertInstanceOf('Pipeline\FloatStream', $floatStream);
+        $this->assertSame(18.0, $floatStream->sum());
     }
 
     public function testSorted()

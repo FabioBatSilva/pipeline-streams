@@ -9,6 +9,31 @@ use Pipeline\Collectors;
 
 class PipelineTest extends TestCase
 {
+    public function testFluentInterface()
+    {
+        $stream = Pipeline::wrap([]);
+
+        $this->assertInstanceOf('Pipeline\Pipeline', $stream->sorted());
+        $this->assertInstanceOf('Pipeline\Pipeline', $stream->skip(10));
+        $this->assertInstanceOf('Pipeline\Pipeline', $stream->distinct());
+        $this->assertInstanceOf('Pipeline\Pipeline', $stream->map('floatval'));
+        $this->assertInstanceOf('Pipeline\Pipeline', $stream->peek('var_dump'));
+        $this->assertInstanceOf('Pipeline\Pipeline', $stream->filter('is_float'));
+        $this->assertInstanceOf('Pipeline\Pipeline', $stream->flatMap(function(float $f){
+            return [$f];
+        }));
+
+        $this->assertInstanceOf('Pipeline\IntPipeline', $stream->mapToInt('intval'));
+        $this->assertInstanceOf('Pipeline\IntPipeline', $stream->flatMapToInt(function(float $f){
+            return [intval($f)];
+        }));
+
+        $this->assertInstanceOf('Pipeline\FloatPipeline', $stream->mapToFloat('floatval'));
+        $this->assertInstanceOf('Pipeline\FloatPipeline', $stream->flatMapToFloat(function(float $f){
+            return [floatval($f)];
+        }));
+    }
+
     public function testReducePipeline()
     {
         $stream = Pipeline::of(2, 4, 8, 18, 32);

@@ -100,7 +100,7 @@ class IntPipeline extends BaseStream implements IntStream
      */
     public function filter(callable $predicate) : Stream
     {
-        return $this->createIntStream($this, function(Sink $sink) use ($predicate) {
+        return new IntPipelineStage($this, function(Sink $sink) use ($predicate) {
             return new FilterSink($sink, $predicate);
         });
     }
@@ -110,7 +110,17 @@ class IntPipeline extends BaseStream implements IntStream
      */
     public function map(callable $mapper) : Stream
     {
-        return $this->createIntStream($this, function(Sink $sink) use ($mapper) {
+        return new IntPipelineStage($this, function(Sink $sink) use ($mapper) {
+            return new MapSink($sink, $mapper);
+        });
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function mapToFloat(callable $mapper) : FloatStream
+    {
+        return new FloatPipelineStage($this, function(Sink $sink) use ($mapper) {
             return new MapSink($sink, $mapper);
         });
     }
@@ -120,7 +130,17 @@ class IntPipeline extends BaseStream implements IntStream
      */
     public function flatMap(callable $mapper) : Stream
     {
-        return $this->createIntStream($this, function(Sink $sink) use ($mapper) {
+        return new IntPipelineStage($this, function(Sink $sink) use ($mapper) {
+            return new FlatMapSink($sink, $mapper);
+        });
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function flatMapToFloat(callable $mapper) : FloatStream
+    {
+        return new FloatPipelineStage($this, function(Sink $sink) use ($mapper) {
             return new FlatMapSink($sink, $mapper);
         });
     }
@@ -130,7 +150,7 @@ class IntPipeline extends BaseStream implements IntStream
      */
     public function distinct() : Stream
     {
-        return $this->createIntStream($this, function(Sink $sink) {
+        return new IntPipelineStage($this, function(Sink $sink) {
             return new DistinctSink($sink);
         });
     }
@@ -140,7 +160,7 @@ class IntPipeline extends BaseStream implements IntStream
      */
     public function sorted(callable $comparator = null) : Stream
     {
-        return $this->createIntStream($this, function(Sink $sink) use ($comparator) {
+        return new IntPipelineStage($this, function(Sink $sink) use ($comparator) {
             return new SortSink($sink, $comparator);
         });
     }
@@ -150,7 +170,7 @@ class IntPipeline extends BaseStream implements IntStream
      */
     public function peek(callable $action) : Stream
     {
-        return $this->createIntStream($this, function(Sink $sink) use ($action) {
+        return new IntPipelineStage($this, function(Sink $sink) use ($action) {
             return new InvokeSink($sink, $action);
         });
     }
@@ -160,7 +180,7 @@ class IntPipeline extends BaseStream implements IntStream
      */
     public function limit(int $maxSize) : Stream
     {
-        return $this->createIntStream($this, function(Sink $sink) use ($maxSize) {
+        return new IntPipelineStage($this, function(Sink $sink) use ($maxSize) {
             return new SliceSink($sink, null, $maxSize);
         });
     }
@@ -170,7 +190,7 @@ class IntPipeline extends BaseStream implements IntStream
      */
     public function skip(int $skip) : Stream
     {
-        return $this->createIntStream($this, function(Sink $sink) use ($skip) {
+        return new IntPipelineStage($this, function(Sink $sink) use ($skip) {
             return new SliceSink($sink, $skip, null);
         });
     }

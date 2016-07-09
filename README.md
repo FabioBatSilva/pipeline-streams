@@ -194,8 +194,8 @@ $numbers = range(1, 20);
 shuffle($numbers);
 
 Pipeline::wrap($numbers)
-    ->sorted()
     ->limit(10)
+    ->sorted()
     ->forEach(function(int $e) {
         var_dump($e);
     });

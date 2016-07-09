@@ -21,23 +21,30 @@ declare(strict_types=1);
 namespace Pipeline;
 
 /**
- * A sequence of int elements supporting aggregate operations.
+ * A sequence of elements supporting conversion to float.
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-interface IntStream extends Stream, ToFloatStream
+interface ToFloatStream
 {
     /**
-     * Returns an int describing the arithmetic mean of elements of this stream.
+     * Returns an FloatStream consisting of the results of applying the
+     * given function to the elements of this stream.
      *
-     * @return int
+     * @param callable $mapper callable to apply to each element
+     *
+     * @return \Pipeline\FloatStream
      */
-    public function average() : int;
+    public function mapToFloat(callable $mapper) : FloatStream;
 
     /**
-     * Returns the sum of elements in this stream.
+     * Returns an FloatStream consisting of the results of replacing each
+     * element of this stream with the contents of a mapped stream produced by
+     * applying the provided mapping function to each element.
      *
-     * @return int
+     * @param callable $mapper A function to apply to each element which produces a stream of new values
+     *
+     * @return \Pipeline\FloatStream
      */
-    public function sum() : int;
+    public function flatMapToFloat(callable $mapper) : FloatStream;
 }

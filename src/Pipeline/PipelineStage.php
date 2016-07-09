@@ -20,24 +20,42 @@ declare(strict_types=1);
 
 namespace Pipeline;
 
+use Pipeline\Sink;
+use Pipeline\Pipeline;
+
 /**
- * A sequence of int elements supporting aggregate operations.
+ * Implements a stream stage.
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-interface IntStream extends Stream, ToFloatStream
+class PipelineStage extends Pipeline
 {
     /**
-     * Returns an int describing the arithmetic mean of elements of this stream.
-     *
-     * @return int
+     * @var callable
      */
-    public function average() : int;
+    private $callable;
 
     /**
-     * Returns the sum of elements in this stream.
+     * Construct
      *
-     * @return int
+     * @param \Pipeline\BaseStream $previousStage
+     * @param callable             $callable
      */
-    public function sum() : int;
+    public function __construct(Pipeline $previousStage, callable $callable)
+    {
+        $this->sourceStage   = $previousStage->sourceStage;
+        $this->previousStage = $previousStage;
+        $this->callable      = $callable;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function opWrapSink(Sink $sink) : Sink
+    {
+        $callable = $this->callable;
+        $wrap     = $callable($sink);
+
+        return $wrap;
+    }
 }

@@ -11,6 +11,36 @@ use Pipeline\FloatPipeline;
 
 class FloatPipelineTest extends TestCase
 {
+    public function testFluentInterface()
+    {
+        $stream = FloatPipeline::wrap([]);
+
+        $this->assertInstanceOf('Pipeline\FloatPipeline', $stream->sorted());
+        $this->assertInstanceOf('Pipeline\FloatPipeline', $stream->skip(10));
+        $this->assertInstanceOf('Pipeline\FloatPipeline', $stream->distinct());
+        $this->assertInstanceOf('Pipeline\FloatPipeline', $stream->map('floatval'));
+        $this->assertInstanceOf('Pipeline\FloatPipeline', $stream->peek('var_dump'));
+        $this->assertInstanceOf('Pipeline\FloatPipeline', $stream->filter('is_float'));
+        $this->assertInstanceOf('Pipeline\FloatPipeline', $stream->flatMap(function(float $f){
+            return [$f];
+        }));
+
+        $this->assertInstanceOf('Pipeline\IntPipeline', $stream->mapToInt('intval'));
+        $this->assertInstanceOf('Pipeline\IntPipeline', $stream->flatMapToInt(function(float $f){
+            return [intval($f)];
+        }));
+    }
+
+    public function testMap()
+    {
+        $stream = FloatPipeline::of(1.0, 2.0, 3.0);
+        $result = $stream->map(function(float $e) : float {
+            return $e * $e;
+        })->toArray();
+
+        $this->assertSame([1.0, 4.0, 9.0], $result);
+    }
+
     public function testReducePipeline()
     {
         $stream = FloatPipeline::of(2.0, 4.0, 8.0, 18.0, 32.0);
