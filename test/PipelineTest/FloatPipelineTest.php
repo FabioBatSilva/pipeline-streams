@@ -29,6 +29,11 @@ class FloatPipelineTest extends TestCase
         $this->assertInstanceOf('Pipeline\IntPipeline', $stream->flatMapToInt(function(float $f){
             return [intval($f)];
         }));
+
+        $this->assertInstanceOf('Pipeline\Pipeline', $stream->mapToMixed('strval'));
+        $this->assertInstanceOf('Pipeline\Pipeline', $stream->flatMapToMixed(function(float $f){
+            return [strval($f)];
+        }));
     }
 
     public function testMap()
@@ -39,6 +44,17 @@ class FloatPipelineTest extends TestCase
         })->toArray();
 
         $this->assertSame([1.0, 4.0, 9.0], $result);
+    }
+
+    public function testMapToMixed()
+    {
+        $floatStream = FloatPipeline::of(1.1, 2.2, 3.3);
+        $mixedStream = $floatStream->mapToMixed(function(float $e) : string {
+            return strval($e);
+        });
+
+        $this->assertInstanceOf('Pipeline\MixedStream', $mixedStream);
+        $this->assertSame(['1.1', '2.2', '3.3'], $mixedStream->toArray());
     }
 
     public function testReducePipeline()
@@ -70,6 +86,17 @@ class FloatPipelineTest extends TestCase
         })->toArray();
 
         $this->assertSame([1.0, 2.0, 3.0, 2.0, 4.0, 6.0, 3.0, 6.0, 9.0], $result);
+    }
+
+    public function testFlatMapToMixed()
+    {
+        $floatStream = FloatPipeline::of(1.1, 2.2, 3.3);
+        $mixedStream = $floatStream->flatMapToMixed(function(float $e) : array {
+            return [$e . 'f'];
+        });
+
+        $this->assertInstanceOf('Pipeline\MixedStream', $mixedStream);
+        $this->assertSame(['1.1f', '2.2f', '3.3f'], $mixedStream->toArray());
     }
 
     public function testSorted()

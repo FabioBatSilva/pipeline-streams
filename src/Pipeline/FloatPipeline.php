@@ -128,6 +128,16 @@ class FloatPipeline extends BaseStream implements FloatStream
     /**
      * {@inheritdoc}
      */
+    public function mapToMixed(callable $mapper) : MixedStream
+    {
+        return new PipelineStage($this, function(Sink $sink) use ($mapper) {
+            return new MapSink($sink, $mapper);
+        });
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function flatMap(callable $mapper) : Stream
     {
         return new FloatPipelineStage($this, function(Sink $sink) use ($mapper) {
@@ -141,6 +151,16 @@ class FloatPipeline extends BaseStream implements FloatStream
     public function flatMapToInt(callable $mapper) : IntStream
     {
         return new IntPipelineStage($this, function(Sink $sink) use ($mapper) {
+            return new FlatMapSink($sink, $mapper);
+        });
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function flatMapToMixed(callable $mapper) : MixedStream
+    {
+        return new PipelineStage($this, function(Sink $sink) use ($mapper) {
             return new FlatMapSink($sink, $mapper);
         });
     }

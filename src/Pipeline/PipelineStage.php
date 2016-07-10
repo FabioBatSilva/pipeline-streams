@@ -41,7 +41,7 @@ class PipelineStage extends Pipeline
      * @param \Pipeline\BaseStream $previousStage
      * @param callable             $callable
      */
-    public function __construct(Pipeline $previousStage, callable $callable)
+    public function __construct(BaseStream $previousStage, callable $callable)
     {
         $this->sourceStage   = $previousStage->sourceStage;
         $this->previousStage = $previousStage;

@@ -5,15 +5,15 @@ namespace PipelineTest\Collector;
 use PipelineTest\TestCase;
 
 use ArrayObject;
-use Pipeline\Collector\MapCollector;
+use Pipeline\Collector\MapperCollector;
 use Pipeline\Collector\ArrayCollector;
 
-class MapCollectorTest extends TestCase
+class MapperCollectorTest extends TestCase
 {
     public function testCollector()
     {
         $downstream = new ArrayCollector();
-        $collector  = new MapCollector(function (string $item) {
+        $collector  = new MapperCollector(function (string $item) {
             return strtoupper($item);
         }, $downstream);
 

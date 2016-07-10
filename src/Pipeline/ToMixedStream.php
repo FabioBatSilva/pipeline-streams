@@ -18,63 +18,33 @@
 
 declare(strict_types=1);
 
-namespace Pipeline\Collector;
-
-use Pipeline\Collector;
+namespace Pipeline;
 
 /**
- * Collector map each element end push to a downstream collector
+ * A sequence of elements supporting conversion to mixed.
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-final class MapCollector implements Collector
+interface ToMixedStream
 {
     /**
-     * @var callable
-     */
-    private $callable;
-
-    /**
-     * @var \Pipeline\Collector
-     */
-    private $downstream;
-
-    /**
-     * Constructor.
+     * Returns an MixedStream consisting of the results of applying the
+     * given function to the elements of this stream.
      *
-     * @param callable            $callable
-     * @param \Pipeline\Collector $downstream
+     * @param callable $mapper callable to apply to each element
+     *
+     * @return \Pipeline\MixedStream
      */
-    public function __construct(callable $callable, Collector $downstream)
-    {
-        $this->callable   = $callable;
-        $this->downstream = $downstream;
-    }
+    public function mapToMixed(callable $mapper) : MixedStream;
 
     /**
-     * {@inheritdoc}
+     * Returns an IntStream consisting of the results of replacing each
+     * element of this stream with the contents of a mapped stream produced by
+     * applying the provided mapping function to each element.
+     *
+     * @param callable $mapper A function to apply to each element which produces a stream of new values
+     *
+     * @return \Pipeline\MixedStream
      */
-    public function begin()
-    {
-        return $this->downstream->begin();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function accept($state, $item)
-    {
-        $callable = $this->callable;
-        $result   = $callable($item);
-
-        $this->downstream->accept($state, $result);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function finish($state)
-    {
-        return $this->downstream->finish($state);
-    }
+    public function flatMapToMixed(callable $mapper) : MixedStream;
 }

@@ -25,7 +25,7 @@ namespace Pipeline;
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-interface IntStream extends Stream, ToFloatStream
+interface IntStream extends Stream, ToFloatStream, ToMixedStream
 {
     /**
      * Returns an int describing the arithmetic mean of elements of this stream.

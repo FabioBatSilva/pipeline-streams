@@ -18,26 +18,63 @@
 
 declare(strict_types=1);
 
-namespace Pipeline;
+namespace Pipeline\Collector;
+
+use Pipeline\Collector;
 
 /**
- * A sequence of float elements supporting aggregate operations.
+ * Collector map each element end push to a downstream collector
  *
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-interface FloatStream extends Stream, ToIntStream, ToMixedStream
+final class MapperCollector implements Collector
 {
     /**
-     * Returns an number describing the arithmetic mean of elements of this stream.
-     *
-     * @return float
+     * @var callable
      */
-    public function average() : float;
+    private $callable;
 
     /**
-     * Returns the sum of elements in this stream.
-     *
-     * @return float
+     * @var \Pipeline\Collector
      */
-    public function sum() : float;
+    private $downstream;
+
+    /**
+     * Constructor.
+     *
+     * @param callable            $callable
+     * @param \Pipeline\Collector $downstream
+     */
+    public function __construct(callable $callable, Collector $downstream)
+    {
+        $this->callable   = $callable;
+        $this->downstream = $downstream;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function begin()
+    {
+        return $this->downstream->begin();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function accept($state, $item)
+    {
+        $callable = $this->callable;
+        $result   = $callable($item);
+
+        $this->downstream->accept($state, $result);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function finish($state)
+    {
+        return $this->downstream->finish($state);
+    }
 }
