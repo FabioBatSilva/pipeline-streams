@@ -28,6 +28,7 @@ use Pipeline\Collector\ConcatCollector;
 use Pipeline\Collector\MinMaxCollector;
 use Pipeline\Collector\AverageCollector;
 use Pipeline\Collector\GroupByCollector;
+use Pipeline\Collector\ArrayMapCollector;
 
 /**
  * Implementations of Collector that implement various useful reduction operations
@@ -49,6 +50,33 @@ final class Collectors
     public static function asArray()
     {
         return new ArrayCollector();
+    }
+
+    /**
+     * Returns a Collector that accumulates elements into a associative array
+     *
+     * @param callable $keyMapper
+     * @param callable $valueMapper
+     * @param callable $mergeFunction
+     *
+     * @return \Pipeline\Collector
+     */
+    public static function asArrayMap(callable $keyMapper, callable $valueMapper = null, callable $mergeFunction = null)
+    {
+
+        if ($valueMapper === null) {
+            $valueMapper = function ($v) {
+                return $v;
+            };
+        };
+
+        if ($mergeFunction === null) {
+            $mergeFunction = function ($v1, $v2, $key) use ($keyMapper) {
+                throw new \InvalidArgumentException("Duplicate key : " . var_export($key, true));
+            };
+        };
+
+        return new ArrayMapCollector($keyMapper, $valueMapper, $mergeFunction);
     }
 
     /**

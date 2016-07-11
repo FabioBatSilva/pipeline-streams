@@ -39,7 +39,7 @@ $stream2 = Pipeline::wrap([
 ]);
 
 // Create stream from Iterator
-$stream3 = Pipeline::wrap(new ArrayIterator([$values]));
+$stream3 = Pipeline::wrap(new ArrayIterator($values));
 ```
 
 ###### IntStream :
