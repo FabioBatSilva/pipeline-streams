@@ -27,5 +27,10 @@
             "PipelineTest\\": "test/PipelineTest",
             "PipelineBench\\": "test/PipelineBench"
         }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "0.1.x-dev"
+        }
     }
 }
