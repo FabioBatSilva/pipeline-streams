@@ -2,6 +2,13 @@ build:
     environment:
         php:
             version: 7.0.8
+    tests:
+        override:
+            -
+                command: 'phpunit -v --coverage-clover ./build/logs/clover.xml'
+                coverage:
+                    file: './build/logs/clover.xml'
+                    format: 'clover'
 
 filter:
     excluded_paths: [tests/*]
