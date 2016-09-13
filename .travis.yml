@@ -25,4 +25,4 @@ script:
 after_script:
     - ./vendor/bin/coveralls -v
     - ./vendor/bin/phpbench run --report=all
-    - wget https://scrutinizer-ci.com/ocular.phar && ocular.phar code-coverage:upload --format=php-clover ./build/logs/clover.xml
+    - wget https://scrutinizer-ci.com/ocular.phar && php ocular.phar code-coverage:upload --format=php-clover ./build/logs/clover.xml
