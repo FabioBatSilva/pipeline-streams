@@ -16,7 +16,7 @@
  * and is licensed under the MIT license.
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace Pipeline;
 
@@ -130,7 +130,7 @@ interface Stream
      *
      * @param callable $action Action to perform on each element
      */
-    public function forEach(callable $action);
+    public function forEach (callable $action);
 
     /**
      * Returns an array containing the elements of this stream.

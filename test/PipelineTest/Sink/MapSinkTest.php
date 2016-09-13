@@ -11,7 +11,7 @@ class MapSinkTest extends TestCase
     public function testSink()
     {
         $downstream = $this->createMock('Pipeline\Sink');
-        $sink       = new MapSink($downstream, function (string $item) {
+        $sink       = new MapSink($downstream, function(string $item) {
             return strtoupper($item);
         });
 

@@ -11,7 +11,7 @@ class FilterSinkTest extends TestCase
     public function testSink()
     {
         $downstream = $this->createMock('Pipeline\Sink');
-        $sink       = new FilterSink($downstream, function (int $e) {
+        $sink       = new FilterSink($downstream, function(int $e) {
             return ($e % 2 != 0);
         });
 

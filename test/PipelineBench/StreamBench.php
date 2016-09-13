@@ -13,7 +13,7 @@ class StreamBench
 {
     private function createIntIterator(int $size) : Iterator
     {
-        for ($i=0; $i < $size; $i++) {
+        for ($i = 0; $i < $size; $i++) {
             yield $i;
         }
     }
@@ -55,7 +55,7 @@ class StreamBench
             ->filter(function(int $e) {
                 return $e % 2 == 0;
             })->peek(function(int $e) use ($peeks) {
-                $peeks->count ++;
+                $peeks->count++;
             })->map(function(int $e) {
                 return $e * 10;
             })

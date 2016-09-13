@@ -16,7 +16,7 @@
  * and is licensed under the MIT license.
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace Pipeline;
 
@@ -72,7 +72,7 @@ abstract class BaseStream implements Stream
     /**
      * {@inheritdoc}
      */
-    public function forEach(callable $action)
+    public function forEach (callable $action)
     {
         $this->evaluate(new ForEachOp($action));
     }
@@ -270,7 +270,7 @@ abstract class BaseStream implements Stream
      */
     private static function defaultComparator() : callable
     {
-        return function ($a, $b) {
+        return function($a, $b) {
             if ($a === $b) {
                 return 0;
             }

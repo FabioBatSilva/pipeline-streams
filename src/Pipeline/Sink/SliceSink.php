@@ -16,7 +16,7 @@
  * and is licensed under the MIT license.
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace Pipeline\Sink;
 
@@ -73,7 +73,7 @@ final class SliceSink extends ChainSink
      */
     public function accept($item)
     {
-        $this->offset ++;
+        $this->offset++;
 
         if ($this->skip !== null && $this->offset <= $this->skip) {
             return;

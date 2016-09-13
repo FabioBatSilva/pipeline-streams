@@ -16,7 +16,7 @@
  * and is licensed under the MIT license.
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace Pipeline\Op;
 
@@ -36,7 +36,6 @@ final class ForEachOp extends BaseTerminalOp
      * Construct
      *
      * @param callable $consumer
-     * @param boolean  $ordered
      */
     public function __construct(callable $consumer)
     {
