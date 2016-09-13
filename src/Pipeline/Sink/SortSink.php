@@ -16,7 +16,7 @@
  * and is licensed under the MIT license.
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace Pipeline\Sink;
 
@@ -70,7 +70,7 @@ final class SortSink extends ChainSink
      */
     public function accept($item)
     {
-        $this->values[$this->offset ++] = $item;
+        $this->values[$this->offset++] = $item;
     }
 
     /**

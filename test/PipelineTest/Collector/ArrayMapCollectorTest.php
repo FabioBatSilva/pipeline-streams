@@ -11,9 +11,9 @@ class ArrayMapCollectorTest extends TestCase
 {
     public function testCollector()
     {
-        $keyMapper     = function (int $e) {return $e;};
-        $valueMapper   = function (int $e) {return $e;};
-        $mergeFunction = function (int $e1, int $e2) {return $e1 + $e2;};
+        $keyMapper     = function(int $e) {return $e; };
+        $valueMapper   = function(int $e) {return $e; };
+        $mergeFunction = function(int $e1, int $e2) {return $e1 + $e2; };
         $collector     = new ArrayMapCollector($keyMapper, $valueMapper, $mergeFunction);
         $state         = $collector->begin();
         $expected      = [

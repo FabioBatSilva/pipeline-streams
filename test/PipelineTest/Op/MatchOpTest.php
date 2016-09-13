@@ -10,7 +10,7 @@ class MatchOpTest extends TestCase
 {
     public function testTerminalOpMatchAnySuccess()
     {
-        $terminalOp = new MatchOp(function (int $e) {
+        $terminalOp = new MatchOp(function(int $e) {
             return $e % 2 == 0;
         }, MatchOp::ANY);
 
@@ -30,7 +30,7 @@ class MatchOpTest extends TestCase
 
     public function testTerminalOpMatchAnyFail()
     {
-        $terminalOp = new MatchOp(function (int $e) {
+        $terminalOp = new MatchOp(function(int $e) {
             return $e % 2 == 0;
         }, MatchOp::ANY);
 
@@ -50,7 +50,7 @@ class MatchOpTest extends TestCase
 
     public function testTerminalOpMatchAllSuccess()
     {
-        $terminalOp = new MatchOp(function (int $e) {
+        $terminalOp = new MatchOp(function(int $e) {
             return $e % 2 == 0;
         }, MatchOp::ALL);
 
@@ -62,12 +62,12 @@ class MatchOpTest extends TestCase
         $terminalOp->accept(4);
         $this->assertFalse($terminalOp->cancellationRequested());
 
-       $this->assertTrue($terminalOp->get());
+        $this->assertTrue($terminalOp->get());
     }
 
     public function testTerminalOpMatchAllFail()
     {
-        $terminalOp = new MatchOp(function (int $e) {
+        $terminalOp = new MatchOp(function(int $e) {
             return $e % 2 == 0;
         }, MatchOp::ALL);
 
@@ -82,12 +82,12 @@ class MatchOpTest extends TestCase
         $terminalOp->accept(5);
         $this->assertTrue($terminalOp->cancellationRequested());
 
-       $this->assertFalse($terminalOp->get());
+        $this->assertFalse($terminalOp->get());
     }
 
     public function testTerminalOpMatchNoneSuccess()
     {
-        $terminalOp = new MatchOp(function (int $e) {
+        $terminalOp = new MatchOp(function(int $e) {
             return $e % 2 == 0;
         }, MatchOp::NONE);
 
@@ -102,12 +102,12 @@ class MatchOpTest extends TestCase
         $terminalOp->accept(5);
         $this->assertFalse($terminalOp->cancellationRequested());
 
-       $this->assertTrue($terminalOp->get());
+        $this->assertTrue($terminalOp->get());
     }
 
     public function testTerminalOpMatchNoneFail()
     {
-        $terminalOp = new MatchOp(function (int $e) {
+        $terminalOp = new MatchOp(function(int $e) {
             return $e % 2 == 0;
         }, MatchOp::NONE);
 
@@ -122,6 +122,6 @@ class MatchOpTest extends TestCase
         $terminalOp->accept(4);
         $this->assertTrue($terminalOp->cancellationRequested());
 
-       $this->assertFalse($terminalOp->get());
+        $this->assertFalse($terminalOp->get());
     }
 }

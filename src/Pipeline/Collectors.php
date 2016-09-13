@@ -16,19 +16,19 @@
  * and is licensed under the MIT license.
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace Pipeline;
 
-use Pipeline\Collector\SumCollector;
-use Pipeline\Collector\CountCollector;
 use Pipeline\Collector\ArrayCollector;
-use Pipeline\Collector\MapperCollector;
-use Pipeline\Collector\ConcatCollector;
-use Pipeline\Collector\MinMaxCollector;
-use Pipeline\Collector\AverageCollector;
-use Pipeline\Collector\GroupByCollector;
 use Pipeline\Collector\ArrayMapCollector;
+use Pipeline\Collector\AverageCollector;
+use Pipeline\Collector\ConcatCollector;
+use Pipeline\Collector\CountCollector;
+use Pipeline\Collector\GroupByCollector;
+use Pipeline\Collector\MapperCollector;
+use Pipeline\Collector\MinMaxCollector;
+use Pipeline\Collector\SumCollector;
 
 /**
  * Implementations of Collector that implement various useful reduction operations
@@ -65,13 +65,13 @@ final class Collectors
     {
 
         if ($valueMapper === null) {
-            $valueMapper = function ($v) {
+            $valueMapper = function($v) {
                 return $v;
             };
         };
 
         if ($mergeFunction === null) {
-            $mergeFunction = function ($v1, $v2, $key) use ($keyMapper) {
+            $mergeFunction = function($v1, $v2, $key) use ($keyMapper) {
                 throw new \InvalidArgumentException("Duplicate key : " . var_export($key, true));
             };
         };
@@ -169,7 +169,6 @@ final class Collectors
      * Returns a Collector implementing a "group by" operation on input elements,
      * grouping elements according to a classification function, and returning the results in a array.
      *
-     * @param callable            $comparator
      * @param \Pipeline\Collector $downstream
      *
      * @return \Pipeline\Collector

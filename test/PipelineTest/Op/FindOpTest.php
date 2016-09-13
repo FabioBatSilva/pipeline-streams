@@ -25,7 +25,7 @@ class FindOpTest extends TestCase
 
     public function testTerminalOpFindCallable()
     {
-        $terminalOp = new FindOp(function (int $e) {
+        $terminalOp = new FindOp(function(int $e) {
             return $e === 3;
         });
 

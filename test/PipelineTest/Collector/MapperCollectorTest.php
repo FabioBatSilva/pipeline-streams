@@ -13,7 +13,7 @@ class MapperCollectorTest extends TestCase
     public function testCollector()
     {
         $downstream = new ArrayCollector();
-        $collector  = new MapperCollector(function (string $item) {
+        $collector  = new MapperCollector(function(string $item) {
             return strtoupper($item);
         }, $downstream);
 

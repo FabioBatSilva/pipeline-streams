@@ -2,25 +2,24 @@
 
 namespace PipelineTest;
 
-use ArrayObject;
-use Pipeline\Pipeline;
 use Pipeline\Collectors;
+use Pipeline\Pipeline;
 
 class StreamCollectTest extends TestCase
 {
     public function testCollectGroupBy()
     {
         $values = [
-            ['key' => 'one',   'value' => '1 - 1'],
-            ['key' => 'one',   'value' => '1 - 2'],
-            ['key' => 'one',   'value' => '1 - 3'],
-            ['key' => 'two',   'value' => '2 - 1'],
-            ['key' => 'two',   'value' => '2 - 2'],
+            ['key' => 'one', 'value' => '1 - 1'],
+            ['key' => 'one', 'value' => '1 - 2'],
+            ['key' => 'one', 'value' => '1 - 3'],
+            ['key' => 'two', 'value' => '2 - 1'],
+            ['key' => 'two', 'value' => '2 - 2'],
             ['key' => 'three', 'value' => '3 - 1']
         ];
 
         $stream   = Pipeline::wrap($values);
-        $result   = $stream->collect(Collectors::groupingBy(function (array $item){
+        $result   = $stream->collect(Collectors::groupingBy(function(array $item) {
             return $item['key'];
         }));
 
@@ -45,19 +44,19 @@ class StreamCollectTest extends TestCase
     public function testCollectGroupByMapping()
     {
         $values = [
-            ['key' => 'one',   'value' => [1, 1]],
-            ['key' => 'one',   'value' => [1, 2]],
-            ['key' => 'one',   'value' => [1, 3]],
-            ['key' => 'two',   'value' => [2, 1]],
-            ['key' => 'two',   'value' => [2, 2]],
+            ['key' => 'one', 'value' => [1, 1]],
+            ['key' => 'one', 'value' => [1, 2]],
+            ['key' => 'one', 'value' => [1, 3]],
+            ['key' => 'two', 'value' => [2, 1]],
+            ['key' => 'two', 'value' => [2, 2]],
             ['key' => 'three', 'value' => [3, 1]]
         ];
 
-        $mapValues = Collectors::mapping(function (array $item) {
+        $mapValues = Collectors::mapping(function(array $item) {
             return implode(' - ', $item['value']);
         });
 
-        $groupByKey = Collectors::groupingBy(function (array $item) {
+        $groupByKey = Collectors::groupingBy(function(array $item) {
             return $item['key'];
         }, $mapValues);
 
@@ -91,7 +90,7 @@ class StreamCollectTest extends TestCase
             ['value' => [2, 2]]
         ];
 
-        $collector = Collectors::mapping(function (array $item){
+        $collector = Collectors::mapping(function(array $item) {
             return implode(' - ', $item['value']);
         });
 
@@ -114,7 +113,7 @@ class StreamCollectTest extends TestCase
         $item4  = ['id' => 4, 'value' => [2, 2]];
         $values = [$item1, $item2, $item3, $item4];
 
-        $collector = Collectors::asArrayMap(function (array $item){
+        $collector = Collectors::asArrayMap(function(array $item) {
             return $item['id'];
         });
 
@@ -142,11 +141,11 @@ class StreamCollectTest extends TestCase
         $item4  = ['id' => 4, 'value' => [2, 2]];
         $values = [$item1, $item2, $item3, $item4];
 
-        $keyMapper = function (array $item) : int {
+        $keyMapper = function(array $item) : int {
             return $item['id'];
         };
 
-        $valueMapper = function (array $item) : array {
+        $valueMapper = function(array $item) : array {
             return $item['value'];
         };
 
@@ -174,15 +173,15 @@ class StreamCollectTest extends TestCase
         $item4  = ['id' => 2, 'value' => [23, 24]];
         $values = [$item1, $item2, $item3, $item4];
 
-        $keyMapper = function (array $item) : int {
+        $keyMapper = function(array $item) : int {
             return $item['id'];
         };
 
-        $valueMapper = function (array $item) : array {
+        $valueMapper = function(array $item) : array {
             return $item['value'];
         };
 
-        $mergeFunction = function (array $item1, array $item2, int $key) : array {
+        $mergeFunction = function(array $item1, array $item2, int $key) : array {
             return array_merge($item1, $item2);
         };
 
@@ -222,7 +221,7 @@ class StreamCollectTest extends TestCase
         ];
 
         Pipeline::wrap($values)
-            ->collect(Collectors::asArrayMap(function (array $item){
+            ->collect(Collectors::asArrayMap(function(array $item) {
                 return $item['id'];
             }));
     }

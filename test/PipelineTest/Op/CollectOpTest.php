@@ -12,7 +12,7 @@ class CollectOpTest extends TestCase
     {
         $collector  = $this->createMock('Pipeline\Collector');
         $terminalOp = new CollectOp($collector);
-        $state      = [1,2];
+        $state      = [1, 2];
 
         $collector
             ->expects($this->once())
@@ -23,14 +23,14 @@ class CollectOpTest extends TestCase
             ->expects($this->exactly(2))
             ->method('accept')
             ->withConsecutive(
-                [ $this->equalTo($state), $this->equalTo(3)],
-                [ $this->equalTo($state), $this->equalTo(4)]
+                [$this->equalTo($state), $this->equalTo(3)],
+                [$this->equalTo($state), $this->equalTo(4)]
             );
 
         $collector
             ->expects($this->once())
             ->method('finish')
-            ->with($this->equalTo([1,2]))
+            ->with($this->equalTo([1, 2]))
             ->willReturn('1,2,3,4');
 
         $terminalOp->begin();

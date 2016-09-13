@@ -2,12 +2,11 @@
 
 namespace PipelineTest;
 
-use Traversable;
-use ArrayObject;
 use ArrayIterator;
-use Pipeline\Stream;
+use ArrayObject;
 use Pipeline\Collector;
 use Pipeline\FloatPipeline;
+use Traversable;
 
 class FloatPipelineTest extends TestCase
 {
@@ -21,17 +20,17 @@ class FloatPipelineTest extends TestCase
         $this->assertInstanceOf('Pipeline\FloatPipeline', $stream->map('floatval'));
         $this->assertInstanceOf('Pipeline\FloatPipeline', $stream->peek('var_dump'));
         $this->assertInstanceOf('Pipeline\FloatPipeline', $stream->filter('is_float'));
-        $this->assertInstanceOf('Pipeline\FloatPipeline', $stream->flatMap(function(float $f){
+        $this->assertInstanceOf('Pipeline\FloatPipeline', $stream->flatMap(function(float $f) {
             return [$f];
         }));
 
         $this->assertInstanceOf('Pipeline\IntPipeline', $stream->mapToInt('intval'));
-        $this->assertInstanceOf('Pipeline\IntPipeline', $stream->flatMapToInt(function(float $f){
+        $this->assertInstanceOf('Pipeline\IntPipeline', $stream->flatMapToInt(function(float $f) {
             return [intval($f)];
         }));
 
         $this->assertInstanceOf('Pipeline\Pipeline', $stream->mapToMixed('strval'));
-        $this->assertInstanceOf('Pipeline\Pipeline', $stream->flatMapToMixed(function(float $f){
+        $this->assertInstanceOf('Pipeline\Pipeline', $stream->flatMapToMixed(function(float $f) {
             return [strval($f)];
         }));
     }
@@ -112,7 +111,7 @@ class FloatPipelineTest extends TestCase
     public function testSortedWithFunction()
     {
         $stream = FloatPipeline::of(2.0, 3.0, 1.0);
-        $result = $stream->sorted(function (float $a, float $b) {
+        $result = $stream->sorted(function(float $a, float $b) {
             return $a <=> $b;
         })->toArray();
 

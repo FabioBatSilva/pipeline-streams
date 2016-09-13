@@ -3,9 +3,9 @@
 namespace PipelineTest;
 
 use ArrayObject;
-use Pipeline\Pipeline;
 use Pipeline\Collector;
 use Pipeline\Collectors;
+use Pipeline\Pipeline;
 
 class PipelineTest extends TestCase
 {
@@ -19,17 +19,17 @@ class PipelineTest extends TestCase
         $this->assertInstanceOf('Pipeline\Pipeline', $stream->map('floatval'));
         $this->assertInstanceOf('Pipeline\Pipeline', $stream->peek('var_dump'));
         $this->assertInstanceOf('Pipeline\Pipeline', $stream->filter('is_float'));
-        $this->assertInstanceOf('Pipeline\Pipeline', $stream->flatMap(function(float $f){
+        $this->assertInstanceOf('Pipeline\Pipeline', $stream->flatMap(function(float $f) {
             return [$f];
         }));
 
         $this->assertInstanceOf('Pipeline\IntPipeline', $stream->mapToInt('intval'));
-        $this->assertInstanceOf('Pipeline\IntPipeline', $stream->flatMapToInt(function(float $f){
+        $this->assertInstanceOf('Pipeline\IntPipeline', $stream->flatMapToInt(function(float $f) {
             return [intval($f)];
         }));
 
         $this->assertInstanceOf('Pipeline\FloatPipeline', $stream->mapToFloat('floatval'));
-        $this->assertInstanceOf('Pipeline\FloatPipeline', $stream->flatMapToFloat(function(float $f){
+        $this->assertInstanceOf('Pipeline\FloatPipeline', $stream->flatMapToFloat(function(float $f) {
             return [floatval($f)];
         }));
     }
@@ -78,7 +78,7 @@ class PipelineTest extends TestCase
     public function testSortedWithFunction()
     {
         $stream = Pipeline::of(2, 3, 1);
-        $result = $stream->sorted(function (int $a, int $b) {
+        $result = $stream->sorted(function(int $a, int $b) {
             return $a <=> $b;
         })->toArray();
 
@@ -326,7 +326,7 @@ class PipelineTest extends TestCase
 
     public function testFlatMapToFloat()
     {
-        $stream   = Pipeline::wrap(['one', 'two', 'three']);
+        $stream = Pipeline::wrap(['one', 'two', 'three']);
         $result = $stream->flatMapToFloat(function(string $e) : array {
             $length = strlen($e);
             $value1 = $length * 1.5;
@@ -374,7 +374,7 @@ class PipelineTest extends TestCase
 
     public function testCountWorks()
     {
-        $readFileLines = function ($file) : \Traversable {
+        $readFileLines = function($file) : \Traversable {
             $file = new \SplFileObject($file);
 
             while ( ! $file->eof()) {
@@ -394,7 +394,7 @@ class PipelineTest extends TestCase
             ->flatMap(function(string $line) {
                 return explode(' ', $line);
             })
-            ->collect(Collectors::groupingBy(function (string $word) {
+            ->collect(Collectors::groupingBy(function(string $word) {
                 return $word;
             }, Collectors::counting()));
 

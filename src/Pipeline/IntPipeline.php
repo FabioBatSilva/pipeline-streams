@@ -16,20 +16,20 @@
  * and is licensed under the MIT license.
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace Pipeline;
 
-use Traversable;
 use ArrayIterator;
+use Traversable;
 
-use Pipeline\Sink\MapSink;
-use Pipeline\Sink\SortSink;
-use Pipeline\Sink\SliceSink;
-use Pipeline\Sink\InvokeSink;
+use Pipeline\Sink\DistinctSink;
 use Pipeline\Sink\FilterSink;
 use Pipeline\Sink\FlatMapSink;
-use Pipeline\Sink\DistinctSink;
+use Pipeline\Sink\InvokeSink;
+use Pipeline\Sink\MapSink;
+use Pipeline\Sink\SliceSink;
+use Pipeline\Sink\SortSink;
 
 /**
  * Implements a pipeline stage or pipeline source stage implementing whose elements are integers.

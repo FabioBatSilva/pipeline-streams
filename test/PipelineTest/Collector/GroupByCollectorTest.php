@@ -13,7 +13,7 @@ class GroupByCollectorTest extends TestCase
     public function testCollector()
     {
         $downstream = new ArrayCollector();
-        $collector  = new GroupByCollector(function (array $item) {
+        $collector  = new GroupByCollector(function(array $item) {
             return $item['key'];
         }, $downstream);
 
@@ -22,11 +22,11 @@ class GroupByCollectorTest extends TestCase
         $this->assertInstanceOf('ArrayObject', $state);
         $this->assertCount(0, $state);
 
-        $itemOne11   = ['key' => 'one',   'value' => 11];
-        $itemOne12   = ['key' => 'one',   'value' => 12];
-        $itemOne13   = ['key' => 'one',   'value' => 13];
-        $itemTwo21   = ['key' => 'two',   'value' => 21];
-        $itemTwo22   = ['key' => 'two',   'value' => 22];
+        $itemOne11   = ['key' => 'one', 'value' => 11];
+        $itemOne12   = ['key' => 'one', 'value' => 12];
+        $itemOne13   = ['key' => 'one', 'value' => 13];
+        $itemTwo21   = ['key' => 'two', 'value' => 21];
+        $itemTwo22   = ['key' => 'two', 'value' => 22];
         $itemThree31 = ['key' => 'three', 'value' => 31];
 
         $collector->accept($state, $itemOne11);

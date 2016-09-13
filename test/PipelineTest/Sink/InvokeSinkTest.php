@@ -13,7 +13,7 @@ class InvokeSinkTest extends TestCase
     {
         $calls      = new ArrayObject();
         $downstream = $this->createMock('Pipeline\Sink');
-        $sink       = new InvokeSink($downstream, function (int $item) use ($calls) {
+        $sink       = new InvokeSink($downstream, function(int $item) use ($calls) {
             $calls[] = $item;
         });
 

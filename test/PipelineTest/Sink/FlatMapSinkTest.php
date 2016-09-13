@@ -11,7 +11,7 @@ class FlatMapSinkTest extends TestCase
     public function testSink()
     {
         $downstream = $this->createMock('Pipeline\Sink');
-        $sink       = new FlatMapSink($downstream, function (array $item) {
+        $sink       = new FlatMapSink($downstream, function(array $item) {
             return $item['values'];
         });
 

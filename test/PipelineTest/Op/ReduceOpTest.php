@@ -10,7 +10,7 @@ class ReduceOpTest extends TestCase
 {
     public function testTerminalOp()
     {
-        $terminalOp = new ReduceOp(function (int $state, int $e) {
+        $terminalOp = new ReduceOp(function(int $state, int $e) {
             return $state + $e;
         }, 0);
 

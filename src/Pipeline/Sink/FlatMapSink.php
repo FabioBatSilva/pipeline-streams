@@ -16,7 +16,7 @@
  * and is licensed under the MIT license.
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace Pipeline\Sink;
 
@@ -38,7 +38,6 @@ final class FlatMapSink extends ChainSink
      * Constructor.
      *
      * @param \Pipeline\Sink $downstream
-     * @param callable       $action
      */
     public function __construct(Sink $downstream, callable $callable)
     {
