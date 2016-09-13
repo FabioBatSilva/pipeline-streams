@@ -38,6 +38,7 @@ final class MapSink extends ChainSink
      * Constructor.
      *
      * @param \Pipeline\Sink $downstream
+     * @param callable       $callable
      */
     public function __construct(Sink $downstream, callable $callable)
     {
