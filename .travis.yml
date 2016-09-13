@@ -15,7 +15,6 @@ allow_failures:
 
 before_install:
     - composer self-update
-    - wget https://scrutinizer-ci.com/ocular.phar
 
 install:
     - composer install --prefer-dist
@@ -26,4 +25,4 @@ script:
 after_script:
     - ./vendor/bin/coveralls -v
     - ./vendor/bin/phpbench run --report=all
-    - ocular.phar code-coverage:upload --format=php-clover ./build/logs/clover.xml
+    - wget https://scrutinizer-ci.com/ocular.phar && ocular.phar code-coverage:upload --format=php-clover ./build/logs/clover.xml
